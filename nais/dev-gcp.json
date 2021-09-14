@@ -1,0 +1,30 @@
+{
+  "app": "sif-tilgangskontroll",
+  "cluster": "dev-gcp",
+  "gcpCluster": "dev-gcp",
+  "namespace": "dusseldorf",
+  "team": "dusseldorf",
+  "minReplicas": "1",
+  "maxReplicas": "2",
+  "ingresses": [
+    "https://sif-tilgangskontroll.dev.nav.no"
+  ],
+  "externalHosts": [
+    "login.microsoftonline.com"
+  ],
+  "azureTenant": "trygdeetaten.no",
+  "env": {
+    "SERVER_PORT": "8080",
+    "SPRING_APPLICATION_NAME": "sif-tilgangskontroll",
+    "SPRING_PROFILES_ACTIVE": "dev-gcp",
+    "KAFKA_ONPREM_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
+    "KAFKA_ONPREM_CONSUMER_AUTO_OFFSET_RESET": "latest",
+    "KAFKA_ONPREM_CONSUMER_SCHEMA_REGISTRY_URL": "https://kafka-schema-registry.nais-q.adeo.no",
+    "KAFKA_AIVEN_CONSUMER_AUTO_OFFSET_RESET": "latest",
+    "NO_NAV_GATEWAYS_K9_SELVBETJENING_OPPSLAG": "https://k9-selvbetjening-oppslag.dev-fss-pub.nais.io",
+    "NO_NAV_GATEWAYS_SAF_BASE_URL": "https://saf.dev-fss-pub.nais.io",
+    "TOKENDINGS_BASE_URL": "https://tokendings.dev-gcp.nais.io"
+  },
+  "slack-channel": "sif-alerts-dev",
+  "slack-notify-type": "<!here> | sif-tilgangskontroll | "
+}

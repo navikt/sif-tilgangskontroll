@@ -1,0 +1,23 @@
+{
+  "app": "sif-tilgangskontroll",
+  "cluster": "prod-gcp",
+  "namespace": "dusseldorf",
+  "team": "dusseldorf",
+  "minReplicas": "1",
+  "maxReplicas": "2",
+  "ingresses": [
+    "https://sif-tilgangskontroll.nav.no"
+  ],
+  "externalHosts": [
+    "login.microsoftonline.com"
+  ],
+  "azureTenant": "nav.no",
+  "env": {
+    "SERVER_PORT": "8080",
+    "SPRING_APPLICATION_NAME": "sif-tilgangskontroll",
+    "SPRING_PROFILES_ACTIVE": "prod-gcp",
+    "TOKENDINGS_BASE_URL": "https://tokendings.prod-gcp.nais.io"
+  },
+  "slack-channel": "sif-alerts",
+  "slack-notify-type": "<!here> | sif-tilgangskontroll | "
+}
