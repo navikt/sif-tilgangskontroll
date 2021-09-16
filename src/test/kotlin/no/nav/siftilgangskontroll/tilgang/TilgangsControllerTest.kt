@@ -3,7 +3,8 @@ package no.nav.siftilgangskontroll.tilgang
 import com.ninjasquad.springmockk.MockkBean
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import no.nav.siftilgangskontroll.Routes.SØKNAD
+import no.nav.siftilgangskontroll.Routes.BARN
+import no.nav.siftilgangskontroll.Routes.TILGANG
 import no.nav.siftilgangskontroll.config.SecurityConfiguration
 import no.nav.siftilgangskontroll.util.CallIdGenerator
 import no.nav.siftilgangskontroll.utils.hentToken
@@ -23,9 +24,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.net.URI
-import java.net.URLDecoder
-import java.nio.charset.Charset
 import javax.servlet.http.Cookie
 
 
@@ -56,7 +54,7 @@ class TilgangsControllerTest {
     fun `gitt request uten token, forevnt 401`() {
         mockMvc.perform(
             MockMvcRequestBuilders
-                .get(URI(URLDecoder.decode(SØKNAD, Charset.defaultCharset())))
+                .post("$TILGANG$BARN")
                 .accept(MediaType.APPLICATION_JSON)
         )
             .andDo(MockMvcResultHandlers.print())
@@ -72,7 +70,7 @@ class TilgangsControllerTest {
     fun `gitt request med token utsedt av annen issuer, forevnt 401`() {
         mockMvc.perform(
             MockMvcRequestBuilders
-                .get(URI(URLDecoder.decode(SØKNAD, Charset.defaultCharset())))
+                .post("$TILGANG$BARN")
                 .accept(MediaType.APPLICATION_JSON)
                 .cookie(
                     Cookie(
@@ -94,7 +92,7 @@ class TilgangsControllerTest {
     fun `gitt request med token med ukjent audience, forevnt 401`() {
         mockMvc.perform(
             MockMvcRequestBuilders
-                .get(URI(URLDecoder.decode(SØKNAD, Charset.defaultCharset())))
+                .post("$TILGANG$BARN")
                 .accept(MediaType.APPLICATION_JSON)
                 .cookie(
                     Cookie(
