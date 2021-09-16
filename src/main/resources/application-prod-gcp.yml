@@ -7,12 +7,5 @@ spring:
   mvc:
     log-request-details: false
 
-no.nav:
-  security.jwt:
-    issuer:
-      tokenx:
-        discoveryUrl: ${TOKEN_X_WELL_KNOWN_URL}
-        accepted_audience: ${TOKEN_X_CLIENT_ID}
-
   metrics:
     interval: 3_600_000 # 1 time

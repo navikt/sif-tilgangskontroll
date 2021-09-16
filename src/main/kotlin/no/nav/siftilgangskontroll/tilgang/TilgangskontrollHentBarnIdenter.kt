@@ -1,6 +1,6 @@
 package no.nav.siftilgangskontroll.tilgang
 
-data class Tilgangskontroll(
+data class TilgangskontrollHentBarnIdenter(
     val harTilgang: Boolean = false,
     val begrunnelse: String? = null
 )

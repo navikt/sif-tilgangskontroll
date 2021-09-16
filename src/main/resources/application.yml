@@ -2,6 +2,27 @@ no.nav:
   metrics:
     interval: 60_000
 
+  gateways:
+    pdl-api-base-url: # Settes i nais/<cluster>.json
+
+  security.jwt:
+    issuer:
+      tokenx:
+        discoveryUrl: ${TOKEN_X_WELL_KNOWN_URL}
+        accepted_audience: ${TOKEN_X_CLIENT_ID}
+
+    client:
+      registration:
+        tokenx-pdl-api:
+          token-endpoint-url: ${TOKENDINGS_BASE_URL}/token
+          grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+          authentication:
+            client-auth-method: private_key_jwt
+            client-id: ${TOKEN_X_CLIENT_ID}
+            client-jwk: ${TOKEN_X_PRIVATE_JWK}
+          token-exchange:
+            audience: ${PDL_API_TOKEN_X_AUDIENCE}
+
 management:
   endpoints:
     web:

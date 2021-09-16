@@ -7,8 +7,3 @@ spring:
   mvc:
     log-request-details: true
 
-no.nav.security.jwt:
-  issuer:
-    tokenx:
-      discoveryUrl: ${TOKEN_X_WELL_KNOWN_URL}
-      accepted_audience: ${TOKEN_X_CLIENT_ID}

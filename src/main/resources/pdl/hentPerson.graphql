@@ -1,0 +1,11 @@
+query($ident: ID!){
+    hentPerson(ident: $ident) {
+        folkeregisteridentifikator(historikk: false){
+            identifikasjonsnummer
+        }
+        adressebeskyttelse {
+            gradering
+        }
+        code
+    }
+}

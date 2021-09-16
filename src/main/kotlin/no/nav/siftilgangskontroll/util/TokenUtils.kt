@@ -1,5 +1,7 @@
 package no.nav.siftilgangskontroll.util
 
+import no.nav.security.token.support.core.context.TokenValidationContext
+import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 
 object TokenClaims {
@@ -11,11 +13,17 @@ object TokenClaims {
 }
 
 fun SpringTokenValidationContextHolder.personIdent(): String {
-    val jwtToken = tokenValidationContext.firstValidToken
-        .orElseThrow { IllegalStateException("Ingen gyldige tokens i Authorization headeren") }
+    val jwtToken: JwtToken = bearerToken()
 
-    val pid = jwtToken.jwtTokenClaims.getStringClaim(TokenClaims.CLAIM_PID)
-    val sub = jwtToken.jwtTokenClaims.getStringClaim(TokenClaims.CLAIM_SUB)
+    return jwtToken.personIdent()
+}
+
+fun SpringTokenValidationContextHolder.bearerToken(): JwtToken = tokenValidationContext.firstValidToken
+    .orElseThrow { IllegalStateException("Ingen gyldige tokens i Authorization headeren") }
+
+fun JwtToken.personIdent(): String {
+    val pid = jwtTokenClaims.getStringClaim(TokenClaims.CLAIM_PID)
+    val sub = jwtTokenClaims.getStringClaim(TokenClaims.CLAIM_SUB)
 
     return when {
         !pid.isNullOrBlank() -> pid
