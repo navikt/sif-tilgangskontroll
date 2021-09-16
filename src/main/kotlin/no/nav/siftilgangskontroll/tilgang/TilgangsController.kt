@@ -23,7 +23,7 @@ class TilgangsController(
     @PostMapping(BARN, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentSøknader(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): PolicyEvaluation? {
+    fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): PolicyEvaluation? {
         val tilgangskontroll = tilgangskontrollService.hentTilgangTilBarn(barnTilgangForespørsel)
         logger.info("Hentet tilgang: {}", tilgangskontroll)
         return tilgangskontroll
