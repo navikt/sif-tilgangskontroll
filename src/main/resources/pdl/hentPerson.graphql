@@ -6,6 +6,5 @@ query($ident: ID!){
         adressebeskyttelse {
             gradering
         }
-        code
     }
 }
