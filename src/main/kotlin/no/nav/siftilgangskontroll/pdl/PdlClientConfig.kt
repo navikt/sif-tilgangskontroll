@@ -4,6 +4,7 @@ import com.expediagroup.graphql.client.spring.GraphQLWebClient
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import no.nav.siftilgangskontroll.util.Constants.NAV_CALL_ID
+import no.nav.siftilgangskontroll.util.Constants.TEMA
 import no.nav.siftilgangskontroll.util.MDCUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -46,6 +47,7 @@ class PdlClientConfig(
                 )
             )
             .defaultRequest {
+                it.header(TEMA, "OMS")
                 it.header(NAV_CALL_ID, MDCUtil.callIdOrNew())
                 it.header(
                     AUTHORIZATION,
