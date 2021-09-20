@@ -24,9 +24,9 @@ no.nav:
             token-endpoint-url: http://localhost:8080/oauth2/v2.0/token
             grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
             authentication:
-              client-auth-method: private_key_jwt
+              client-auth-method: client_secret_basic
               client-id: "dev-gcp:dusseldorf:sif-tilgangskontroll"
-              client-jwk: src/test/resources/tokenx-jwk.json
+              client-secret: secret
 
   metrics:
     interval: 36000

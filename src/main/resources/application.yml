@@ -28,9 +28,9 @@ no.nav:
           grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
           scope: ${PDL_API_AZURE_AUDIENCE}
           authentication:
-            client-auth-method: private_key_jwt
+            client-auth-method: client_secret_basic
             client-id: ${AZURE_APP_CLIENT_ID}
-            client-jwk: ${AZURE_APP_JWK}
+            client-secret: ${AZURE_APP_CLIENT_SECRET}
 
 management:
   endpoints:
