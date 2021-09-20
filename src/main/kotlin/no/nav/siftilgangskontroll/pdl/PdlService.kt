@@ -25,7 +25,6 @@ class PdlService(
     suspend fun person(ident: String): Person {
         val result = pdlClient.execute(HentPerson(HentPerson.Variables(ident))) {
             val borgerToken = pdlAuthService.borgerToken()
-            logger.info("Borgertoken: {}", borgerToken)
             header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
         }
 
