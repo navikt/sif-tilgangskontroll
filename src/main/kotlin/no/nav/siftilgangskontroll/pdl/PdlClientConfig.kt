@@ -19,17 +19,12 @@ import reactor.netty.http.client.HttpClientResponse
 
 @Configuration
 class PdlClientConfig(
-    oauth2Config: ClientConfigurationProperties,
-    private val oAuth2AccessTokenService: OAuth2AccessTokenService,
     @Value("\${no.nav.gateways.pdl-api-base-url}") private val pdlBaseUrl: String
 ) {
 
     private companion object {
         private val logger = LoggerFactory.getLogger(PdlClientConfig::class.java)
     }
-
-    private val tokenxPdlClientProperties = oauth2Config.registration["tokenx-pdl-api"]
-        ?: throw RuntimeException("could not find oauth2 client config for tokenx-pdl-api")
 
     @Bean
     fun pdlClient() = GraphQLWebClient(
@@ -49,10 +44,6 @@ class PdlClientConfig(
             .defaultRequest {
                 it.header(TEMA, "OMS")
                 it.header(NAV_CALL_ID, MDCUtil.callIdOrNew())
-                it.header(
-                    AUTHORIZATION,
-                    "Bearer ${oAuth2AccessTokenService.getAccessToken(tokenxPdlClientProperties).accessToken}"
-                )
             }
     )
 }

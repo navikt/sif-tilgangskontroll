@@ -8,12 +8,14 @@ import no.nav.siftilgangskontroll.pdl.generated.ID
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Service
 
 @Service
 class PdlService(
     private val pdlClient: GraphQLWebClient,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val pdlAuthService: PdlAuthService
 ) {
 
     private companion object {
@@ -21,7 +23,9 @@ class PdlService(
     }
 
     suspend fun person(ident: String): Person {
-        val result =  pdlClient.execute(HentPerson(HentPerson.Variables(ident)))
+        val result = pdlClient.execute(HentPerson(HentPerson.Variables(ident))) {
+            header(HttpHeaders.AUTHORIZATION, "Bearer ${pdlAuthService.borgerToken()}")
+        }
 
         return when {
             !result.errors.isNullOrEmpty() -> {
@@ -37,7 +41,9 @@ class PdlService(
     }
 
     suspend fun barn(identer: List<ID>): List<HentPersonBolkResult> {
-        val result = pdlClient.execute(HentBarn(HentBarn.Variables(identer)))
+        val result = pdlClient.execute(HentBarn(HentBarn.Variables(identer))) {
+            header(HttpHeaders.AUTHORIZATION, "Bearer ${pdlAuthService.systemToken()}")
+        }
 
         return when {
             !result.errors.isNullOrEmpty() -> {
