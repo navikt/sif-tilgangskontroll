@@ -19,7 +19,8 @@ object Policies {
                     borger.harStrengtFortroligAdresse() -> permit("Borger har tilgang til barn med strengt fortrolig adresse.")
                     else -> {
                         when (val harBarnMedStrengtFortroligAdresse: Boolean =
-                            this.barn.any { !it.person!!.harStrengtFortroligAdresse() }) {
+                            this.barn.any { it.person!!.harStrengtFortroligAdresse() }) {
+
                             harBarnMedStrengtFortroligAdresse -> {
                                 deny("Borger har ikke tilgang til barn med strengt fortrolig adresse.")
                             }
