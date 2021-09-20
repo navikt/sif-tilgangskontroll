@@ -16,7 +16,8 @@
     "SERVER_PORT": "8080",
     "SPRING_APPLICATION_NAME": "sif-tilgangskontroll",
     "SPRING_PROFILES_ACTIVE": "prod-gcp",
-    "PDL_API_AUDIENCE": "prod-fss:pdl:pdl-api",
+    "PDL_API_TOKENX_AUDIENCE": "prod-fss:pdl:pdl-api",
+    "PDL_API_AZURE_AUDIENCE": "api://prod-fss.pdl.pdl-api/.default",
     "NO_NAV_GATEWAYS_SAF_PDL_API_BASE_URL": "https://pdl-api.prod-fss-pub.nais.io",
     "TOKENDINGS_BASE_URL": "https://tokendings.prod-gcp.nais.io"
   },
