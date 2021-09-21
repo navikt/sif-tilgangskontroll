@@ -11,7 +11,7 @@ no.nav:
       client:
         registration:
           tokenx-pdl-api:
-            token-endpoint-url: http://localhost:8080/default/token
+            token-endpoint-url: http://localhost:${mock-oauth2-server.port}/oauth2/v2.0/token
             grant-type: urn:ietf:params:oauth:grant-type:token-exchange
             authentication:
               client-auth-method: private_key_jwt
@@ -21,11 +21,12 @@ no.nav:
               audience: dev-fss:pdl:pdl-api
 
           azure-pdl-api:
-            token-endpoint-url: http://localhost:8080/oauth2/v2.0/token
-            grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+            token-endpoint-url: http://localhost:${mock-oauth2-server.port}/oauth2/v2.0/token
+            grant-type: client_credentials
+            scope: pdl-api
             authentication:
               client-auth-method: client_secret_basic
-              client-id: "dev-gcp:dusseldorf:sif-tilgangskontroll"
+              client-id: sif-tilgangskontroll
               client-secret: secret
 
   metrics:
@@ -34,7 +35,7 @@ no.nav:
 logging:
   level:
     root: INFO
-
+    no.nav: DEBUG
 
 wiremock:
   reset-mappings-after-each-test: true
