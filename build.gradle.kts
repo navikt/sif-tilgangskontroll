@@ -38,11 +38,6 @@ ext["okhttp3.version"] = okHttp3Version
 
 repositories {
     mavenCentral()
-
-    maven {
-        name = "confluent"
-        url = uri("https://packages.confluent.io/maven/")
-    }
 }
 
 dependencies {
