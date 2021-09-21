@@ -1,6 +1,6 @@
 package no.nav.siftilgangskontroll.util
 
-import no.nav.security.token.support.core.context.TokenValidationContext
+import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
 
@@ -18,7 +18,7 @@ fun SpringTokenValidationContextHolder.personIdent(): String {
     return jwtToken.personIdent()
 }
 
-fun SpringTokenValidationContextHolder.bearerToken(): JwtToken = tokenValidationContext.firstValidToken
+fun TokenValidationContextHolder.bearerToken(): JwtToken = tokenValidationContext.firstValidToken
     .orElseThrow { IllegalStateException("Ingen gyldige tokens i Authorization headeren") }
 
 fun JwtToken.personIdent(): String {
