@@ -1,23 +1,43 @@
 no.nav:
+  gateways:
+    pdl-api-base-url: http://localhost:${wiremock.server.port}/pdl-api-mock
+
   security:
     jwt:
       issuer:
         tokenx:
           discoveryurl: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
           accepted_audience: k9-sak-innsyn-api
+      client:
+        registration:
+          tokenx-pdl-api:
+            token-endpoint-url: http://localhost:${mock-oauth2-server.port}/oauth2/v2.0/token
+            grant-type: urn:ietf:params:oauth:grant-type:token-exchange
+            authentication:
+              client-auth-method: private_key_jwt
+              client-id: "dev-gcp:dusseldorf:sif-tilgangskontroll"
+              client-jwk: src/test/resources/tokenx-jwk.json
+            token-exchange:
+              audience: dev-fss:pdl:pdl-api
+
+          azure-pdl-api:
+            token-endpoint-url: http://localhost:${mock-oauth2-server.port}/oauth2/v2.0/token
+            grant-type: client_credentials
+            scope: pdl-api
+            authentication:
+              client-auth-method: client_secret_basic
+              client-id: sif-tilgangskontroll
+              client-secret: secret
+
   metrics:
     interval: 36000
 
 logging:
   level:
     root: INFO
-    state:
-      change:
-        logger: ERROR
-    kafka: ERROR
-    org:
-      apache:
-        zookeeper: ERROR
-        kafka:
-         common:
-           metrics: ERROR
+    no.nav: DEBUG
+
+wiremock:
+  reset-mappings-after-each-test: true
+  server:
+    port: 0 # random port

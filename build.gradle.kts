@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.5.30"
     kotlin("plugin.spring") version "1.5.30"
     kotlin("plugin.jpa") version "1.5.30"
+    id("com.expediagroup.graphql") version "4.2.0"
 }
 
 group = "no.nav"
@@ -31,16 +32,12 @@ val mockkVersion by extra("1.11.0")
 val guavaVersion by extra("23.0")
 val okHttp3Version by extra("4.9.1")
 val orgJsonVersion by extra("20210307")
+val graphQLKotlinVersion by extra("4.2.0")
 
 ext["okhttp3.version"] = okHttp3Version
 
 repositories {
     mavenCentral()
-
-    maven {
-        name = "confluent"
-        url = uri("https://packages.confluent.io/maven/")
-    }
 }
 
 dependencies {
@@ -71,6 +68,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
 
+    // Spring Cloud
+    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-contract-stub-runner
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
+    testImplementation("org.springframework.cloud:spring-cloud-starter")
+
     // SpringFox
     implementation("io.springfox:springfox-boot-starter:$springfoxVersion")
 
@@ -82,6 +84,9 @@ dependencies {
 
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    //graphql
+    implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -101,6 +106,12 @@ dependencies {
     testImplementation("io.mockk:mockk:$mockkVersion")
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -114,4 +125,10 @@ tasks.withType<KotlinCompile> {
 
 tasks.getByName<Jar>("jar") {
     enabled = false
+}
+
+tasks.withType<com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateClientTask> {
+    queryFileDirectory.set("${project.projectDir}/src/main/resources/pdl")
+    schemaFile.set(file("${project.projectDir}/src/main/resources/pdl/pdl-api-schema.graphql"))
+    packageName.set("no.nav.siftilgangskontroll.pdl.generated")
 }
