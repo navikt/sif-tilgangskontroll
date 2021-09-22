@@ -6,5 +6,8 @@ query($ident: ID!){
         adressebeskyttelse {
             gradering
         }
+        doedsfall {
+            doedsdato
+        }
     }
 }

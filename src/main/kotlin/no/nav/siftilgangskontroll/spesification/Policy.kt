@@ -83,12 +83,12 @@ inline fun <T, R> requirePermitOrFail(ctx: T, policy: Policy<T>, block: (PolicyE
 
 inline fun <T, R> requirePermit(ctx: T, policy: Policy<T>, block: () -> R) = policy.requirePermit(ctx, block)
 
-inline fun <T, R> evaluate(ctx: T, policy: Policy<T>, block: (PolicyEvaluation) -> R?): R? =
+inline fun <T, R> evaluate(ctx: T, policy: Policy<T>, block: (PolicyEvaluation) -> R): R =
     policy.evaluate(ctx).let {
         block.invoke(it)
     }
 
-inline fun <T, R> authorize(ctx: T, policy: Policy<T>, block: (PolicyEvaluation) -> R?): R? =
+inline fun <T, R> authorize(ctx: T, policy: Policy<T>, block: (PolicyEvaluation) -> R): R =
     policy.requirePermitOrFail(ctx, block)
 
 data class PolicyEvaluationException(

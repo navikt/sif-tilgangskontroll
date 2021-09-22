@@ -12,12 +12,6 @@ object TokenClaims {
     const val CLAIM_SUB = "sub"
 }
 
-fun SpringTokenValidationContextHolder.personIdent(): String {
-    val jwtToken: JwtToken = bearerToken()
-
-    return jwtToken.personIdent()
-}
-
 fun TokenValidationContextHolder.bearerToken(): JwtToken = tokenValidationContext.firstValidToken
     .orElseThrow { IllegalStateException("Ingen gyldige tokens i Authorization headeren") }
 

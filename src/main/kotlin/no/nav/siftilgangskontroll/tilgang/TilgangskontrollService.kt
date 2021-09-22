@@ -1,5 +1,6 @@
 package no.nav.siftilgangskontroll.tilgang
 
+import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.spesification.PolicyEvaluation
 import no.nav.siftilgangskontroll.spesification.evaluate
 import org.slf4j.LoggerFactory
@@ -15,7 +16,7 @@ class TilgangskontrollService(
         private val logger = LoggerFactory.getLogger(TilgangskontrollService::class.java)
     }
 
-    fun hentTilgangTilBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: String): PolicyEvaluation? {
+    fun hentTilgangTilBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken): PolicyEvaluation {
 
         val hentBarnContext = hentBarnContext(
             bearerToken,
@@ -23,8 +24,21 @@ class TilgangskontrollService(
             tilgangsAttributter
         )
 
-        return evaluate(hentBarnContext, Policies.`borgers tilgang til barn med strengt fortrolig adresse`) {
-            logger.debug("access is approved.")
+        return evaluate(ctx = hentBarnContext,
+            policy = Policies.`Barn er i live`
+                .and(Policies.`borger har tilgang til barn med strengt fortrolig adresse`)
+
+        ) {
+            it
+        }
+    }
+
+    fun hentTilgangTilPerson(bearerToken: JwtToken): PolicyEvaluation {
+        val personContext = hentPersonContext(bearerToken, tilgangsAttributter)
+        return evaluate(
+            ctx = personContext,
+            policy = Policies.`NAV-bruker i live`
+        ) {
             it
         }
     }

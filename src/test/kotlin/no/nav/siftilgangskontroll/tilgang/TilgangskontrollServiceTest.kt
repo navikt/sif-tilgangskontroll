@@ -78,7 +78,7 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger har tilgang til barn")
+        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND Borger har tilgang til barn)")
     }
 
     @Test
@@ -104,7 +104,7 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger har ikke tilgang til skjermet barn")
+        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND Borger har ikke tilgang til skjermet barn)")
     }
 
     @Test
@@ -130,7 +130,7 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger har tilgang til barn")
+        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND Borger har tilgang til barn)")
     }
 
     @Test
