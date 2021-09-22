@@ -3,12 +3,15 @@ package no.nav.siftilgangskontroll.tilgang
 import kotlinx.coroutines.runBlocking
 import no.nav.siftilgangskontroll.pdl.PdlService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.Adressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import no.nav.siftilgangskontroll.spesification.Policy
 import no.nav.siftilgangskontroll.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.spesification.equalTo
 import org.slf4j.Logger
 import org.springframework.stereotype.Component
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as AdressebeskyttelseBarn
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as PersonBarn
 
 typealias PersonIdent = String
 typealias BarnIdent = String
@@ -64,11 +67,9 @@ fun <T> List<T>.filterBy(policy: Policy<T>, decision: PolicyDecision, logger: Lo
 }
 
 fun Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
-    .map { it.gradering }
-    .contains(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
+    .contains(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
 
-fun no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
-    .map { it.gradering }
-    .contains(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
+fun PersonBarn.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
+    .contains(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
 
 internal fun String.path(path: String) = "${this.removeSuffix("/")}/${path.removePrefix("/")}"
