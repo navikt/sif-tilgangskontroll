@@ -57,7 +57,9 @@ class PdlService(
                 throw IllegalStateException("Feil ved henting av person-bolk.")
             }
             result.data!!.hentPersonBolk.isNotEmpty() -> {
-                val barn = result.data!!.hentPersonBolk!!
+                val barn = result.data!!.hentPersonBolk
+                    .filter { it.person!!.doedsfall.isEmpty() }
+
                 logger.info("Hentet barn: fra PDL: {}", barn)
                 barn
             }

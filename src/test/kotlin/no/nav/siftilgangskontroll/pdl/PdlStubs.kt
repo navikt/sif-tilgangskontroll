@@ -34,7 +34,8 @@ internal fun hentPersonPdlResponse(personIdent: String, adressebeskyttelseGrader
                             {
                                 "identifikasjonsnummer": "$personIdent"
                             }
-                        ]
+                        ],
+                        "doedsfall": []
                     }
                 }
             }
