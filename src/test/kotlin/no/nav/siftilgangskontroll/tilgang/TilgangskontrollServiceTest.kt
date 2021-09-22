@@ -39,7 +39,7 @@ class TilgangskontrollServiceTest {
     private lateinit var pdlService: PdlService
 
     @Test
-    fun `gitt skjermet person, forvent tilgang til skjermet barn`() {
+    fun `gitt skjermet borger, forvent tilgang til skjermet barn`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
@@ -60,11 +60,11 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation!!.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger har tilgang til barn med strengt fortrolig adresse.")
+        assertThat(policyEvaluation.reason).isEqualTo("Borger har tilgang til barn")
     }
 
     @Test
-    fun `gitt vanlig person, forvent tilgang forbudt til skjermet barn`() {
+    fun `gitt vanlig borger, forvent tilgang forbudt til skjermet barn`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf()
@@ -85,11 +85,11 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation!!.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger har ikke tilgang til barn med strengt fortrolig adresse.")
+        assertThat(policyEvaluation.reason).isEqualTo("Borger har ikke tilgang til skjermet barn")
     }
 
     @Test
-    fun `gitt vanlig person, forvent tilgang til barn`() {
+    fun `gitt vanlig borger, forvent tilgang til barn`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf()
@@ -109,7 +109,7 @@ class TilgangskontrollServiceTest {
         val policyEvaluation = tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel("123", "456"), "ey...")
 
         assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation!!.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger har ikke tilgang til barn med strengt fortrolig adresse.")
+        assertThat(policyEvaluation!!.decision).isEqualTo(PolicyDecision.PERMIT)
+        assertThat(policyEvaluation.reason).isEqualTo("Borger har tilgang til barn")
     }
 }

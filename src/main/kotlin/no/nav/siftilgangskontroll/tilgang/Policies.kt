@@ -19,22 +19,13 @@ object Policies {
             description = "NAV Bruker med spes.reg.kode 6 skal ikke kunne se sin geografiske adresse (alle typer)."
             evaluation = {
                 val borgerHarStrengtFortroligAdresse = borger.harStrengtFortroligAdresse()
-                val harBarnMedStrengtFortroligAdresse: Boolean = barn.any { it.person!!.harStrengtFortroligAdresse() }
+                val barnHarStrengtFortroligAdresse: Boolean = barn.any { it.person!!.harStrengtFortroligAdresse() }
                 logger.info("borgerHarStrengtFortroligAdresse: {}", borgerHarStrengtFortroligAdresse)
-                logger.info("harBarnMedStrengtFortroligAdresse: {}", harBarnMedStrengtFortroligAdresse)
+                logger.info("barnHarStrengtFortroligAdresse: {}", barnHarStrengtFortroligAdresse)
+
                 when {
-                    borgerHarStrengtFortroligAdresse -> permit("Borger har tilgang til barn med strengt fortrolig adresse.")
-                    else -> {
-                        when {
-                            harBarnMedStrengtFortroligAdresse -> {
-                                logger.info("harBarnMedStrengtFortroligAdresse: {}", harBarnMedStrengtFortroligAdresse)
-                                deny("Borger har ikke tilgang til barn med strengt fortrolig adresse.")
-                            }
-                            else -> {
-                                permit("Borger har tilgang til barn med strengt fortrolig adresse.")
-                            }
-                        }
-                    }
+                    !borgerHarStrengtFortroligAdresse && barnHarStrengtFortroligAdresse -> deny("Borger har ikke tilgang til skjermet barn")
+                    else -> permit("Borger har tilgang til barn")
                 }
             }
         }
