@@ -26,7 +26,7 @@ class TilgangskontrollService(
 
         return evaluate(ctx = hentBarnContext,
             policy = Policies.`Barn er i live`
-                .and(Policies.`borger har tilgang til barn med strengt fortrolig adresse`)
+                .and(Policies.`NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`)
 
         ) {
             it
@@ -37,7 +37,7 @@ class TilgangskontrollService(
         val personContext = hentPersonContext(bearerToken, tilgangsAttributter)
         return evaluate(
             ctx = personContext,
-            policy = Policies.`NAV-bruker i live`
+            policy = Policies.`NAV-bruker er i live`
         ) {
             it
         }

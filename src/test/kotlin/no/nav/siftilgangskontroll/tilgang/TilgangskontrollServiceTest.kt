@@ -56,7 +56,7 @@ class TilgangskontrollServiceTest {
     }
 
     @Test
-    fun `gitt skjermet borger, forvent tilgang til skjermet barn`() {
+    fun `gitt NAV-bruker med adressebeskyttelse, forvent tilgang til barn med adressebeskyttelse`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
@@ -78,11 +78,11 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND Borger har tilgang til barn)")
+        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND NAV-bruker har tilgang til barn)")
     }
 
     @Test
-    fun `gitt vanlig borger, forvent tilgang forbudt til skjermet barn`() {
+    fun `gitt NAV-bruker uten adressebeskyttelse, forvent nektet tilgang til barn med adressebeskyttelse`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
@@ -104,11 +104,11 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND Borger har ikke tilgang til skjermet barn)")
+        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND NAV-bruker har ikke tilgang til barn med adressebeskyttelse)")
     }
 
     @Test
-    fun `gitt vanlig borger, forvent tilgang til barn`() {
+    fun `gitt NAV-bruker uten adressebeskyttelse, forvent tilgang til barn uten adressebeskyttelse`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
@@ -130,11 +130,11 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND Borger har tilgang til barn)")
+        assertThat(policyEvaluation.reason).isEqualTo("(Barn er i live AND NAV-bruker har tilgang til barn)")
     }
 
     @Test
-    fun `gitt borger ikke lenger er i live, forvent tilgang forbudt`() {
+    fun `gitt NAV-bruker ikke lenger er i live, forvent nektet tilgang`() {
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
@@ -145,6 +145,6 @@ class TilgangskontrollServiceTest {
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.reason).isEqualTo("Borger er ikke lenger i live")
+        assertThat(policyEvaluation.reason).isEqualTo("NAV-bruker er ikke lenger i live")
     }
 }
