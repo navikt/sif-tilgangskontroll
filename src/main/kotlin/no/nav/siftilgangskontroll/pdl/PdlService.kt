@@ -34,11 +34,7 @@ class PdlService(
                 logger.error("Feil ved henting av person. Årsak: {}", errorSomJson)
                 throw IllegalStateException("Feil ved henting av person.")
             }
-            result.data!!.hentPerson != null -> {
-                val person = result.data!!.hentPerson!!
-                logger.info("Hentet person: fra PDL: {}", person)
-                person
-            }
+            result.data!!.hentPerson != null ->  result.data!!.hentPerson!!
             else -> {
                 throw IllegalStateException("Feil ved henting av person.")
             }
@@ -56,13 +52,7 @@ class PdlService(
                 logger.error("Feil ved henting av person-bolk. Årsak: {}", errorSomJson)
                 throw IllegalStateException("Feil ved henting av person-bolk.")
             }
-            result.data!!.hentPersonBolk.isNotEmpty() -> {
-                val barn = result.data!!.hentPersonBolk
-                    .filter { it.person!!.doedsfall.isEmpty() }
-
-                logger.info("Hentet barn: fra PDL: {}", barn)
-                barn
-            }
+            result.data!!.hentPersonBolk.isNotEmpty() -> result.data!!.hentPersonBolk
             else -> {
                 throw IllegalStateException("Feil ved henting av person-bolk.")
             }
