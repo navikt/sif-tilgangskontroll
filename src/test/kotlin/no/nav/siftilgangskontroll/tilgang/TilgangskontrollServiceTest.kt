@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as AdressebeskyttelseBarn
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as FolkeregisteridentifikatorBarn
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as PersonBarn
 
 @ExtendWith(SpringExtension::class)
@@ -76,18 +77,23 @@ class TilgangskontrollServiceTest {
                 ident = "123456789",
                 person = PersonBarn(
                     doedsfall = listOf(),
-                    adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
+                    adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
+                    folkeregisteridentifikator = listOf(
+                        FolkeregisteridentifikatorBarn(
+                            relatertPersonsIdent
+                        )
+                    )
                 ),
                 code = "200"
             )
         )
 
         val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(relatertPersonsIdent), jwtToken)
+            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
+        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
@@ -118,18 +124,19 @@ class TilgangskontrollServiceTest {
                 ident = "123456789",
                 person = PersonBarn(
                     doedsfall = listOf(),
-                    adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
+                    adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
+                    folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
                 ),
                 code = "200"
             )
         )
 
         val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(relatertPersonsIdent), jwtToken)
+            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.DENY),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
@@ -140,6 +147,8 @@ class TilgangskontrollServiceTest {
 
     @Test
     fun `gitt NAV-bruker med relasjoner, forvent nektet tilgang til ukjent barn`() {
+        val ukjentRelasjonIdent = "456"
+
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
@@ -158,17 +167,19 @@ class TilgangskontrollServiceTest {
                 ident = "123456789",
                 person = PersonBarn(
                     doedsfall = listOf(),
-                    adressebeskyttelse = listOf()
+                    adressebeskyttelse = listOf(),
+                    folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(ukjentRelasjonIdent))
                 ),
                 code = "200"
             )
         )
 
-        val policyEvaluation = tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel("456"), jwtToken)
+        val policyEvaluation =
+            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
@@ -199,18 +210,19 @@ class TilgangskontrollServiceTest {
                 ident = "123456789",
                 person = PersonBarn(
                     doedsfall = listOf(),
-                    adressebeskyttelse = listOf()
+                    adressebeskyttelse = listOf(),
+                    folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
                 ),
                 code = "200"
             )
         )
 
         val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(relatertPersonsIdent), jwtToken)
+            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
+        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),

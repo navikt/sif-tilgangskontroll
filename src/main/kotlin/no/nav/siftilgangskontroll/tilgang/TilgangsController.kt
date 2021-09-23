@@ -41,7 +41,7 @@ class TilgangsController(
     @PostMapping(BARN, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<PolicyEvaluation> {
+    fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<BarnTilgangResponse>> {
         val bearerToken = contextHolder.bearerToken()
         val tilgangskontroll =
             tilgangskontrollService.hentTilgangTilBarn(barnTilgangForespørsel, bearerToken)
@@ -56,3 +56,5 @@ fun PolicyEvaluation.somResponseEntity() = when(decision) {
     PolicyDecision.DENY -> ResponseEntity(this, FORBIDDEN)
     PolicyDecision.NOT_APPLICABLE -> ResponseEntity(INTERNAL_SERVER_ERROR)
 }
+
+fun List<BarnTilgangResponse>.somResponseEntity() = ResponseEntity(this, OK)

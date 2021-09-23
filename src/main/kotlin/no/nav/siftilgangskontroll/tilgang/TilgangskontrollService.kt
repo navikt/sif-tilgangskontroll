@@ -20,27 +20,28 @@ class TilgangskontrollService(
         private val logger = LoggerFactory.getLogger(TilgangskontrollService::class.java)
     }
 
-    fun hentTilgangTilBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken): PolicyEvaluation {
+    fun hentTilgangTilBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken): List<BarnTilgangResponse> {
 
-        val hentBarnContext = hentBarnContext(
+        val hentBarnContext = tilgangsAttributter.hentBarnContext(
             bearerToken,
-            barnTilgangForespørsel,
-            tilgangsAttributter
+            barnTilgangForespørsel
         )
 
-        return evaluate(
-            ctx = hentBarnContext,
-            policy = `Barn er i live`
-                    and `NAV-bruker skal ikke ha tilgang til ukjent relasjon`
-                    and `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`,
-            block = { it })
+        return hentBarnContext.barn.barn.map { barn ->
+            evaluate(
+                ctx = hentBarnContext,
+                policy = `Barn er i live`(barn.personIdent())
+                        and `NAV-bruker skal ikke ha tilgang til ukjent relasjon`(barn.personIdent())
+                        and `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barn.personIdent()),
+                block = { BarnTilgangResponse(barn.personIdent(), it) })
+        }
     }
 
     fun hentTilgangTilPerson(bearerToken: JwtToken): PolicyEvaluation {
-        val personContext = hentPersonContext(bearerToken, tilgangsAttributter)
+        val personContext = tilgangsAttributter.hentPersonContext(bearerToken)
         return evaluate(
             ctx = personContext,
-            policy = `NAV-bruker er i live`,
+            policy = `NAV-bruker er i live`(),
             block = { it })
     }
 }

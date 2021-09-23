@@ -13,13 +13,13 @@ object Policies {
 
     private val logger = LoggerFactory.getLogger(Policies::class.java)
 
-    val `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`: Policy<HentBarnContext> =
+    fun `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barnIdent: BarnIdent): Policy<HentBarnContext> =
         policy {
             id = "SIF.1"
             description = "NAV-Bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse"
             evaluation = {
                 val borgerHarStrengtFortroligAdresse = borger.harStrengtFortroligAdresse()
-                val barnHarStrengtFortroligAdresse: Boolean = barn.harStrengtFortroligAdresse()
+                val barnHarStrengtFortroligAdresse: Boolean = barn.harStrengtFortroligAdresse(barnIdent)
                 logger.info("borgerHarStrengtFortroligAdresse: {}", borgerHarStrengtFortroligAdresse)
                 logger.info("barnHarStrengtFortroligAdresse: {}", barnHarStrengtFortroligAdresse)
 
@@ -31,12 +31,12 @@ object Policies {
         }
 
 
-    val `Barn er i live`: Policy<HentBarnContext> =
+    fun `Barn er i live`(ident: BarnIdent): Policy<HentBarnContext> =
         policy {
             id = "SIF.2"
             description = "Tilgang skal nektes til barn som ikke er i live."
             evaluation = {
-                when (barn.erDød()) {
+                when (barn.erDød(ident)) {
                     true -> deny("Barn er ikke lenger i live")
                     else -> permit("Barn er i live")
                 }
@@ -44,14 +44,13 @@ object Policies {
         }
 
     // TODO: 23/09/2021 Mulig med fullmakt kanskje?
-    val `NAV-bruker skal ikke ha tilgang til ukjent relasjon`: Policy<HentBarnContext> =
+    fun `NAV-bruker skal ikke ha tilgang til ukjent relasjon`(barnIdent: BarnIdent): Policy<HentBarnContext> =
         policy {
             id = "SIF.3"
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
             evaluation = {
 
-                val erKjentRelasjon = borger.relasjoner().map { it.relatertPersonsIdent }
-                    .contains(barn.barnIdent[0]) // TODO: 23/09/2021 Forbedre sjekk til å støtte flere ID-er.
+                val erKjentRelasjon = borger.relasjoner().map { it.relatertPersonsIdent }.contains(barnIdent)
 
                 when {
                     erKjentRelasjon -> permit("Relasjon er kjent")
@@ -60,7 +59,7 @@ object Policies {
             }
         }
 
-    val `NAV-bruker er i live`: Policy<HentPersonContext> =
+    fun `NAV-bruker er i live`(): Policy<HentPersonContext> =
         policy {
             id = "FP.10"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som ikke er i live."
