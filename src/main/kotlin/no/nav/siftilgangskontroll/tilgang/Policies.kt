@@ -13,8 +13,6 @@ object Policies {
 
     private val logger = LoggerFactory.getLogger(Policies::class.java)
 
-
-
     val `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`: Policy<HentBarnContext> =
         policy {
             id = "SIF.1"
@@ -45,6 +43,7 @@ object Policies {
             }
         }
 
+    // TODO: 23/09/2021 Mulig med fullmakt kanskje?
     val `NAV-bruker skal ikke ha tilgang til ukjent relasjon`: Policy<HentBarnContext> =
         policy {
             id = "SIF.3"
