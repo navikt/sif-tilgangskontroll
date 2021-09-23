@@ -10,6 +10,8 @@ import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenRespons
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
+import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.ForelderBarnRelasjon
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -54,8 +56,17 @@ internal class PdlServiceTest {
         val personIdent = "14026223262"
         wireMockServer.stubPdlHentPerson("hentPerson") {
             hentPersonPdlResponse(
-                personIdent,
-                AdressebeskyttelseGradering.STRENGT_FORTROLIG
+                personIdent = personIdent,
+                adressebeskyttelseGradering = AdressebeskyttelseGradering.STRENGT_FORTROLIG,
+                forelderBarnRelasjon = forelderBarnPdlRelasjon(
+                    listOf(
+                        ForelderBarnRelasjon(
+                            relatertPersonsIdent = "123",
+                            relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
+                            minRolleForPerson = ForelderBarnRelasjonRolle.FAR
+                        )
+                    )
+                ).toString()
             )
         }
 

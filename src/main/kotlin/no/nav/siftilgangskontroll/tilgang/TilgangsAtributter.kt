@@ -6,6 +6,7 @@ import no.nav.siftilgangskontroll.pdl.PdlService
 import no.nav.siftilgangskontroll.pdl.generated.ID
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Adressebeskyttelse
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.ForelderBarnRelasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import no.nav.siftilgangskontroll.spesification.Policy
 import no.nav.siftilgangskontroll.spesification.PolicyDecision
@@ -58,7 +59,8 @@ data class Borger(
     val person = runBlocking { tilgangsAttributter.pdlService.person(personIdent) }
 
     fun harStrengtFortroligAdresse(): Boolean = person.harStrengtFortroligAdresse()
-    fun erDød() = person.erDød()
+    fun erDød(): Boolean = person.erDød()
+    fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon
 }
 
 data class Barn(
