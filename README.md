@@ -27,7 +27,8 @@ Tjenesten eksponerer api for at andre tjenester kan utføre tilgangskontroll på
 # 3. Begrensninger
 N/A
 
-# 4. ProgramvarearkitekN/A
+# 4. Programvarearkitektur
+N/A
 
 # 5. Kode
 N/A
