@@ -13,6 +13,8 @@ object Policies {
 
     private val logger = LoggerFactory.getLogger(Policies::class.java)
 
+
+
     val `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`: Policy<HentBarnContext> =
         policy {
             id = "SIF.1"
@@ -36,9 +38,25 @@ object Policies {
             id = "SIF.2"
             description = "Tilgang skal nektes til barn som ikke er i live."
             evaluation = {
-                when(barn.erDød()) {
+                when (barn.erDød()) {
                     true -> deny("Barn er ikke lenger i live")
                     else -> permit("Barn er i live")
+                }
+            }
+        }
+
+    val `NAV-bruker skal ikke ha tilgang til ukjent relasjon`: Policy<HentBarnContext> =
+        policy {
+            id = "SIF.3"
+            description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
+            evaluation = {
+
+                val erKjentRelasjon = borger.relasjoner().map { it.relatertPersonsIdent }
+                    .contains(barn.barnIdent[0]) // TODO: 23/09/2021 Forbedre sjekk til å støtte flere ID-er.
+
+                when {
+                    erKjentRelasjon -> permit("Relasjon er kjent")
+                    else -> deny("NAV-bruker har ikke tilgang til ukjent relasjon")
                 }
             }
         }
@@ -48,7 +66,7 @@ object Policies {
             id = "FP.10"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som ikke er i live."
             evaluation = {
-                when(borger.erDød()) {
+                when (borger.erDød()) {
                     true -> deny("NAV-bruker er ikke lenger i live")
                     else -> permit("NAV-bruker er i live")
                 }
