@@ -35,7 +35,7 @@ data class HentBarnContext(
     )
 
     val barn = Barn(
-        barnIdent = barnTilgangForespørsel.barnIdent,
+        barnIdent = barnTilgangForespørsel.barnIdenter,
         tilgangsAttributter = tilgangsAttributter
     )
 }
