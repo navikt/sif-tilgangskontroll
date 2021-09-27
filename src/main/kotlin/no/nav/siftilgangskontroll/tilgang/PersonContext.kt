@@ -7,6 +7,10 @@ import no.nav.siftilgangskontroll.pdl.generated.hentperson.Adressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.ForelderBarnRelasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import no.nav.siftilgangskontroll.util.personIdent
+import java.time.LocalDate
+import java.time.Period
+
+const val MYNDIG_ALDER = 15
 
 data class HentPersonContext(
     private val bearerToken: JwtToken,
@@ -27,6 +31,14 @@ data class Borger(
     fun harStrengtFortroligAdresse(): Boolean = person.harStrengtFortroligAdresse()
     fun erDød(): Boolean = person.erDød()
     fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon
+    fun fødselsdato(): LocalDate = LocalDate.parse(person.foedsel.first().foedselsdato!!)
+    fun erMyndig(): Boolean {
+        val alder = Period.between(fødselsdato(), LocalDate.now()).years
+            return when {
+                alder >= MYNDIG_ALDER -> true
+                else -> false
+            }
+    }
 }
 
 fun Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse

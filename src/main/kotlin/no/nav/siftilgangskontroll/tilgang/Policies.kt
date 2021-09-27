@@ -68,4 +68,16 @@ object Policies {
                 }
             }
         }
+
+    fun `NAV-bruker under myndighetsalder`(): Policy<HentPersonContext> =
+        policy {
+            id = "FP.11"
+            description = "Tilgang til selvbetjening skal nektes til NAV-brukere som er mindreårig (under 15 år)."
+            evaluation = {
+                when (borger.erMyndig()) {
+                    true ->  permit("NAV-bruker er myndig")
+                    else -> deny("NAV-bruker er ikke myndig")
+                }
+            }
+        }
 }
