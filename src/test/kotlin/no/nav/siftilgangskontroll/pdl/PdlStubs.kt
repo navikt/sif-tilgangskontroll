@@ -25,6 +25,7 @@ internal fun WireMockServer.stubPdlHentPerson(requestBodyContaining: String, res
 
 internal fun hentPersonPdlResponse(
     personIdent: String,
+    fødselsdato: String = "1990-09-27",
     adressebeskyttelseGradering: AdressebeskyttelseGradering,
     forelderBarnRelasjon: String = forelderBarnPdlRelasjon(listOf()).toString()
 ): String = //language=json
@@ -40,6 +41,11 @@ internal fun hentPersonPdlResponse(
                         "folkeregisteridentifikator": [
                             {
                                 "identifikasjonsnummer": "$personIdent"
+                            }
+                        ],
+                        "foedsel": [
+                            {
+                                "foedselsdato": "$fødselsdato"
                             }
                         ],
                         "doedsfall": [],

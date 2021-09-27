@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as AdressebeskyttelseBarn
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as FolkeregisteridentifikatorBarn
@@ -69,7 +70,8 @@ class TilgangskontrollServiceTest {
                     relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
                     minRolleForPerson = null
                 )
-            )
+            ),
+            foedsel = listOf(Foedsel("1990-09-27"))
         )
 
         coEvery { pdlService.barn(any()) } returns listOf(
@@ -116,7 +118,8 @@ class TilgangskontrollServiceTest {
                     relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
                     minRolleForPerson = null
                 )
-            )
+            ),
+            foedsel = listOf(Foedsel("1990-09-27"))
         )
 
         coEvery { pdlService.barn(any()) } returns listOf(
@@ -159,7 +162,8 @@ class TilgangskontrollServiceTest {
                     relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
                     minRolleForPerson = null
                 )
-            )
+            ),
+            foedsel = listOf(Foedsel("1990-09-27"))
         )
 
         coEvery { pdlService.barn(any()) } returns listOf(
@@ -202,7 +206,8 @@ class TilgangskontrollServiceTest {
                     relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
                     minRolleForPerson = null
                 )
-            )
+            ),
+            foedsel = listOf(Foedsel("1990-09-27"))
         )
 
         coEvery { pdlService.barn(any()) } returns listOf(
@@ -238,14 +243,43 @@ class TilgangskontrollServiceTest {
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(Doedsfall(LocalDateTime.now().toString())),
-            forelderBarnRelasjon = listOf()
+            forelderBarnRelasjon = listOf(),
+            foedsel = listOf(Foedsel("1990-09-27"))
         )
 
         val policyEvaluation = tilgangskontrollService.hentTilgangTilPerson(jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.id).isEqualTo("FP.10")
         assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.DENY),
+                PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.PERMIT)
+            )
+        )
+    }
+
+    @Test
+    fun `gitt NAV-bruker er under myndighetsalder (15), forvent nektet tilgang`() {
+
+        coEvery { pdlService.person(any()) } returns Person(
+            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
+            adressebeskyttelse = listOf(),
+            doedsfall = listOf(),
+            forelderBarnRelasjon = listOf(),
+            foedsel = listOf(Foedsel(LocalDate.now().minusDays(14).toString()))
+        )
+
+        val policyEvaluation = tilgangskontrollService.hentTilgangTilPerson(jwtToken)
+
+        assertThat(policyEvaluation).isNotNull()
+        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.DENY)
+            )
+        )
     }
 }
 

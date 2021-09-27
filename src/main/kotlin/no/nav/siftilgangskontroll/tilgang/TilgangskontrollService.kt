@@ -6,6 +6,7 @@ import no.nav.siftilgangskontroll.spesification.evaluate
 import no.nav.siftilgangskontroll.tilgang.Policies.`Barn er i live`
 import no.nav.siftilgangskontroll.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.tilgang.Policies.`NAV-bruker skal ikke ha tilgang til ukjent relasjon`
+import no.nav.siftilgangskontroll.tilgang.Policies.`NAV-bruker under myndighetsalder`
 import no.nav.siftilgangskontroll.tilgang.Policies.`NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -41,7 +42,7 @@ class TilgangskontrollService(
         val personContext = tilgangsAttributter.hentPersonContext(bearerToken)
         return evaluate(
             ctx = personContext,
-            policy = `NAV-bruker er i live`(),
+            policy = `NAV-bruker er i live`() and `NAV-bruker under myndighetsalder`(),
             block = { it })
     }
 }
