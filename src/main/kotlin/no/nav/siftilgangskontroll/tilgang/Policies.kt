@@ -20,8 +20,6 @@ object Policies {
             evaluation = {
                 val borgerHarStrengtFortroligAdresse = borger.harStrengtFortroligAdresse()
                 val barnHarStrengtFortroligAdresse: Boolean = barn.harStrengtFortroligAdresse(barnIdent)
-                logger.info("borgerHarStrengtFortroligAdresse: {}", borgerHarStrengtFortroligAdresse)
-                logger.info("barnHarStrengtFortroligAdresse: {}", barnHarStrengtFortroligAdresse)
 
                 when {
                     !borgerHarStrengtFortroligAdresse && barnHarStrengtFortroligAdresse -> deny("NAV-bruker har ikke tilgang til barn med adressebeskyttelse")
