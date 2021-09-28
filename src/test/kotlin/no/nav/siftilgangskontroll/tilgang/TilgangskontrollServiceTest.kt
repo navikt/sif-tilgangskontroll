@@ -260,14 +260,14 @@ class TilgangskontrollServiceTest {
     }
 
     @Test
-    fun `gitt NAV-bruker er under myndighetsalder (15), forvent nektet tilgang`() {
+    fun `gitt NAV-bruker er under myndighetsalder (18), forvent nektet tilgang`() {
 
         coEvery { pdlService.person(any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(),
             forelderBarnRelasjon = listOf(),
-            foedsel = listOf(Foedsel(LocalDate.now().minusDays(14).toString()))
+            foedsel = listOf(Foedsel(LocalDate.now().minusDays(17).toString()))
         )
 
         val policyEvaluation = tilgangskontrollService.hentTilgangTilPerson(jwtToken)

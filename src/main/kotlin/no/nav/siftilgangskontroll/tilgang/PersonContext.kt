@@ -10,7 +10,7 @@ import no.nav.siftilgangskontroll.util.personIdent
 import java.time.LocalDate
 import java.time.Period
 
-const val MYNDIG_ALDER = 15
+const val MYNDIG_ALDER = 18
 
 data class HentPersonContext(
     private val bearerToken: JwtToken,

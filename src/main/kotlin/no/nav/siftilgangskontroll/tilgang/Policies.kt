@@ -72,7 +72,7 @@ object Policies {
     fun `NAV-bruker under myndighetsalder`(): Policy<HentPersonContext> =
         policy {
             id = "FP.11"
-            description = "Tilgang til selvbetjening skal nektes til NAV-brukere som er mindreårig (under 15 år)."
+            description = "Tilgang til selvbetjening skal nektes til NAV-brukere som er mindreårig (under $MYNDIG_ALDER år)."
             evaluation = {
                 when (borger.erMyndig()) {
                     true ->  permit("NAV-bruker er myndig")
