@@ -42,7 +42,7 @@ object Policies {
         }
 
     // TODO: 23/09/2021 Mulig med fullmakt kanskje?
-    fun `NAV-bruker skal ikke ha tilgang til ukjent relasjon`(barnIdent: BarnIdent): Policy<HentBarnContext> =
+    fun `NAV-bruker har tilgang relasjon`(barnIdent: BarnIdent): Policy<HentBarnContext> =
         policy {
             id = "SIF.3"
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
@@ -69,7 +69,7 @@ object Policies {
             }
         }
 
-    fun `NAV-bruker under myndighetsalder`(): Policy<HentPersonContext> =
+    fun `NAV-bruker er myndig`(): Policy<HentPersonContext> =
         policy {
             id = "FP.11"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som er mindreårig (under $MYNDIG_ALDER år)."
