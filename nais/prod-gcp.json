@@ -1,6 +1,7 @@
 {
   "app": "sif-tilgangskontroll",
   "cluster": "prod-gcp",
+  "fss-cluster": "dev-fss",
   "namespace": "dusseldorf",
   "team": "dusseldorf",
   "minReplicas": "1",

@@ -18,6 +18,9 @@ spec:
     inbound:
       rules:
         - application: k9-sak-innsyn-api
+        - application: k9-selvbetjening-oppslag
+          namespace: dusseldorf
+          cluster: {{fss-cluster}}
     outbound:
       external:
         {{#each externalHosts as |host|}}
