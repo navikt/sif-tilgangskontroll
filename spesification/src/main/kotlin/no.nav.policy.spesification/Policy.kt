@@ -1,4 +1,4 @@
-package no.nav.siftilgangskontroll.spesification
+package no.nav.policy.spesification
 
 data class Policy<T>(
     val id: String = "",

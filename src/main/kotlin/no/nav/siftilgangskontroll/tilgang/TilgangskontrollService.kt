@@ -1,8 +1,8 @@
 package no.nav.siftilgangskontroll.tilgang
 
+import no.nav.policy.spesification.PolicyEvaluation
 import no.nav.security.token.support.core.jwt.JwtToken
-import no.nav.siftilgangskontroll.spesification.PolicyEvaluation
-import no.nav.siftilgangskontroll.spesification.evaluate
+import no.nav.policy.spesification.evaluate
 import no.nav.siftilgangskontroll.tilgang.Policies.`Barn er i live`
 import no.nav.siftilgangskontroll.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.tilgang.Policies.`NAV-bruker har tilgang relasjon`

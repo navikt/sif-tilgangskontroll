@@ -6,8 +6,8 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
-import no.nav.siftilgangskontroll.spesification.PolicyDecision
-import no.nav.siftilgangskontroll.spesification.PolicyEvaluation
+import no.nav.policy.spesification.PolicyDecision
+import no.nav.policy.spesification.PolicyEvaluation
 import no.nav.siftilgangskontroll.util.bearerToken
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*

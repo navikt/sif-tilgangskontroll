@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    `maven-publish`
     id("org.springframework.boot") version "2.5.5"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm") version "1.5.31"
@@ -10,12 +11,47 @@ plugins {
 }
 
 group = "no.nav"
-version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "11"
+        }
+    }
+}
+
+subprojects {
+    apply(plugin = "maven-publish")
+    configure<PublishingExtension> {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/navikt/sif-tilgangskontroll")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+        afterEvaluate {
+            publications {
+                register<MavenPublication>("gpr") {
+                    from(components["java"])
+                }
+            }
+        }
     }
 }
 
@@ -36,11 +72,8 @@ val graphQLKotlinVersion by extra("4.2.0")
 
 ext["okhttp3.version"] = okHttp3Version
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
+    implementation(project(":spesification"))
 
     // NAV
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
@@ -114,13 +147,6 @@ dependencyManagement {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
-    }
 }
 
 tasks.getByName<Jar>("jar") {

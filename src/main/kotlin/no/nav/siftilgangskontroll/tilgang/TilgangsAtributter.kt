@@ -2,9 +2,9 @@ package no.nav.siftilgangskontroll.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.pdl.PdlService
-import no.nav.siftilgangskontroll.spesification.Policy
-import no.nav.siftilgangskontroll.spesification.PolicyDecision
-import no.nav.siftilgangskontroll.spesification.equalTo
+import no.nav.policy.spesification.Policy
+import no.nav.policy.spesification.PolicyDecision
+import no.nav.policy.spesification.equalTo
 import org.slf4j.Logger
 import org.springframework.stereotype.Component
 
