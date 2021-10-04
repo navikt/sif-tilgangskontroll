@@ -54,9 +54,6 @@ jobs:
           docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
           docker push ${IMAGE}
 
-      - name: publish packages
-        run: ./gradlew publish
-
   deploy-dev-gcp:
     name: Deploy to dev-gcp
     if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*

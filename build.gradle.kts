@@ -48,7 +48,6 @@ subprojects {
         afterEvaluate {
             publications {
                 register<MavenPublication>("gpr") {
-                    version = project.findProperty("version") as String
                     from(components["java"])
                 }
             }
