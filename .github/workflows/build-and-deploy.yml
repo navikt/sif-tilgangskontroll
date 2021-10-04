@@ -85,8 +85,8 @@ jobs:
           RESOURCE: nais/naiserator.yml
           VARS: nais/prod-gcp.json
 
-  build-code-and-publish-packages:
-    name: Build code and push docker image
+  publish-packages:
+    name: Publish packages
     if: startsWith(github.ref, 'refs/heads/master') # Build and push docker if branch is master
     needs: test
     runs-on: ubuntu-latest
