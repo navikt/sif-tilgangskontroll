@@ -1,4 +1,4 @@
-package no.nav.siftilgangskontroll.spesification
+package no.nav.policy.spesification
 
 enum class PolicyDecision {
     PERMIT {

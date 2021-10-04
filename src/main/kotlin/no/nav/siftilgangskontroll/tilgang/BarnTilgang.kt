@@ -1,6 +1,6 @@
 package no.nav.siftilgangskontroll.tilgang
 
-import no.nav.siftilgangskontroll.spesification.PolicyEvaluation
+import no.nav.policy.spesification.PolicyEvaluation
 
 data class BarnTilgangForespørsel(
     val barnIdenter: List<BarnIdent>

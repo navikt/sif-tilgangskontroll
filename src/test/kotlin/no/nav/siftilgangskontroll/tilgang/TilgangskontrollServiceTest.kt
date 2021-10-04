@@ -13,8 +13,8 @@ import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGraderin
 import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
-import no.nav.siftilgangskontroll.spesification.PolicyDecision
-import no.nav.siftilgangskontroll.spesification.PolicyEvaluation
+import no.nav.policy.spesification.PolicyDecision
+import no.nav.policy.spesification.PolicyEvaluation
 import no.nav.siftilgangskontroll.utils.hentToken
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

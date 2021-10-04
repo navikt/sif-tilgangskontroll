@@ -36,11 +36,8 @@ val graphQLKotlinVersion by extra("4.2.0")
 
 ext["okhttp3.version"] = okHttp3Version
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
+    implementation(project(":spesification"))
 
     // NAV
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
@@ -112,15 +109,21 @@ dependencyManagement {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "11"
+        }
+    }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
-    }
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 tasks.getByName<Jar>("jar") {
