@@ -9,7 +9,6 @@ plugins {
     kotlin("plugin.jpa") version "1.5.31"
 }
 
-group = "no.nav"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -19,6 +18,8 @@ configurations {
 }
 
 allprojects {
+    group = "no.nav.sif.tilgangskontroll"
+
     repositories {
         mavenCentral()
     }

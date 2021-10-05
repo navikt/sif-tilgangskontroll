@@ -5,7 +5,6 @@ plugins {
     id("com.expediagroup.graphql")  version "4.2.0"
 }
 
-group = "no.nav"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 val logstashLogbackEncoderVersion by extra("6.6")
