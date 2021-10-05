@@ -6,6 +6,8 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.TILGANG
 import no.nav.siftilgangskontroll.config.SecurityConfiguration
+import no.nav.siftilgangskontroll.core.tilgang.OppslagsService
+import no.nav.siftilgangskontroll.pdl.PdlAuthService
 import no.nav.siftilgangskontroll.util.CallIdGenerator
 import no.nav.siftilgangskontroll.utils.hentToken
 import org.junit.Assert.assertNotNull
@@ -43,7 +45,10 @@ class TilgangsControllerTest {
     lateinit var mockOAuth2Server: MockOAuth2Server
 
     @MockkBean(relaxed = true)
-    lateinit var tilgangskontrollService: TilgangskontrollService
+    lateinit var oppslagsService: OppslagsService
+
+    @MockkBean(relaxed = true)
+    lateinit var pdlAuthService: PdlAuthService
 
     @BeforeAll
     internal fun setUp() {

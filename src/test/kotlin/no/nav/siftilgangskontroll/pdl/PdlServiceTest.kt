@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.siftilgangskontroll.core.pdl.PdlService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.ForelderBarnRelasjon
@@ -70,6 +71,6 @@ internal class PdlServiceTest {
             )
         }
 
-        runBlocking { pdlService.person(personIdent) }
+        runBlocking { pdlService.person(personIdent, "") }
     }
 }

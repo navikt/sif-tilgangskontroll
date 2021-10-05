@@ -7,7 +7,12 @@ import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
 import no.nav.policy.spesification.PolicyDecision
-import no.nav.policy.spesification.PolicyEvaluation
+import no.nav.security.token.support.core.jwt.JwtToken
+import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
+import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangResponse
+import no.nav.siftilgangskontroll.core.tilgang.OppslagsService
+import no.nav.siftilgangskontroll.core.tilgang.PersonTilgangResponse
+import no.nav.siftilgangskontroll.pdl.PdlAuthService
 import no.nav.siftilgangskontroll.util.bearerToken
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*
@@ -20,7 +25,8 @@ import org.springframework.web.bind.annotation.*
 @ProtectedWithClaims(issuer = "tokenx")
 class TilgangsController(
     private val contextHolder: TokenValidationContextHolder,
-    private val tilgangskontrollService: TilgangskontrollService
+    private val oppslagsService: OppslagsService,
+    private val pdlAuthService: PdlAuthService
 ) {
     companion object {
         val logger = LoggerFactory.getLogger(TilgangsController::class.java)
@@ -29,29 +35,28 @@ class TilgangsController(
     @GetMapping(PERSON, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentTilgangTilPerson(): ResponseEntity<PolicyEvaluation> {
+    fun hentTilgangTilPerson(): ResponseEntity<PersonTilgangResponse> {
         val bearerToken = contextHolder.bearerToken()
-        val tilgangskontroll =
-            tilgangskontrollService.hentTilgangTilPerson(bearerToken)
-        logger.info("Hentet tilgang: {}", tilgangskontroll)
+        val personOppslagRespons =
+            oppslagsService.hentPerson(bearerToken)
+        logger.info("Hentet tilgang: {}", personOppslagRespons)
 
-        return tilgangskontroll.somResponseEntity()
+        return personOppslagRespons.somResponseEntity()
     }
 
     @PostMapping(BARN, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
     fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<BarnTilgangResponse>> {
-        val bearerToken = contextHolder.bearerToken()
-        val tilgangskontroll =
-            tilgangskontrollService.hentTilgangTilBarn(barnTilgangForespørsel, bearerToken)
-        logger.info("Hentet tilgang: {}", tilgangskontroll)
+        val barnOppslagRespons =
+            oppslagsService.hentBarn(barnTilgangForespørsel, JwtToken(pdlAuthService.borgerToken()), JwtToken(pdlAuthService.systemToken()))
+        logger.info("Hentet tilgang: {}", barnOppslagRespons)
 
-        return tilgangskontroll.somResponseEntity()
+        return barnOppslagRespons.somResponseEntity()
     }
 }
 
-fun PolicyEvaluation.somResponseEntity() = when(decision) {
+fun PersonTilgangResponse.somResponseEntity() = when(policyEvaluation.decision) {
     PolicyDecision.PERMIT -> ResponseEntity(this, OK)
     PolicyDecision.DENY -> ResponseEntity(this, FORBIDDEN)
     PolicyDecision.NOT_APPLICABLE -> ResponseEntity(INTERNAL_SERVER_ERROR)

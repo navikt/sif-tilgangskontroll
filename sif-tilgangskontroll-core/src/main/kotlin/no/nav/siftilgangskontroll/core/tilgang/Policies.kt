@@ -1,4 +1,4 @@
-package no.nav.siftilgangskontroll.tilgang
+package no.nav.siftilgangskontroll.core.tilgang
 
 import no.nav.policy.spesification.Policy
 import no.nav.policy.spesification.Policy.Companion.policy
