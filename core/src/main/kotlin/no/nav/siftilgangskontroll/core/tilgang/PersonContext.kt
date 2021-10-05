@@ -1,12 +1,12 @@
-package no.nav.siftilgangskontroll.tilgang
+package no.nav.siftilgangskontroll.core.tilgang
 
 import kotlinx.coroutines.runBlocking
 import no.nav.security.token.support.core.jwt.JwtToken
+import no.nav.siftilgangskontroll.core.utils.personIdent
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Adressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.ForelderBarnRelasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
-import no.nav.siftilgangskontroll.util.personIdent
 import java.time.LocalDate
 import java.time.Period
 
@@ -17,16 +17,16 @@ data class HentPersonContext(
     private val tilgangsAttributter: TilgangsAttributter
 ) {
     val borger = Borger(
-        personIdent = bearerToken.personIdent(),
+        borgerToken = bearerToken.tokenAsString,
         tilgangsAttributter = tilgangsAttributter
     )
 }
 
 data class Borger(
-    val personIdent: PersonIdent,
+    val borgerToken: String,
     val tilgangsAttributter: TilgangsAttributter
 ) {
-    val person = runBlocking { tilgangsAttributter.pdlService.person(personIdent) }
+    val person = runBlocking { tilgangsAttributter.pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken) }
 
     fun harStrengtFortroligAdresse(): Boolean = person.harStrengtFortroligAdresse()
     fun erDød(): Boolean = person.erDød()
@@ -45,3 +45,4 @@ fun Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
     .contains(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
 
 fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
+fun Person.ident() = folkeregisteridentifikator.first().identifikasjonsnummer

@@ -1,4 +1,4 @@
-package no.nav.policy.spesification
+package no.nav.siftilgangskontroll.policy.spesification
 
 data class PolicyEvaluation(
     val decision: PolicyDecision,

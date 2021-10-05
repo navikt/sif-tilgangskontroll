@@ -8,13 +8,15 @@ import io.mockk.coEvery
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import no.nav.siftilgangskontroll.pdl.PdlService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
-import no.nav.policy.spesification.PolicyDecision
-import no.nav.policy.spesification.PolicyEvaluation
+import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
+import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
+import no.nav.siftilgangskontroll.core.pdl.PdlService
+import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
+import no.nav.siftilgangskontroll.core.tilgang.TilgangService
+import no.nav.siftilgangskontroll.core.tilgang.TilgangResponse
 import no.nav.siftilgangskontroll.utils.hentToken
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,10 +39,10 @@ import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as PersonBarn
 @ActiveProfiles("test")
 @EnableMockOAuth2Server // Tilgjengliggjør en oicd-provider for test.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
-class TilgangskontrollServiceTest {
+class TilgangServiceTest {
 
     @Autowired
-    private lateinit var tilgangskontrollService: TilgangskontrollService
+    private lateinit var tilgangService: TilgangService
 
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
@@ -60,7 +62,7 @@ class TilgangskontrollServiceTest {
     fun `gitt NAV-bruker med adressebeskyttelse, forvent tilgang til barn med adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any()) } returns Person(
+        coEvery { pdlService.person(any(), any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
             doedsfall = listOf(),
@@ -74,28 +76,24 @@ class TilgangskontrollServiceTest {
             foedsel = listOf(Foedsel("1990-09-27"))
         )
 
-        coEvery { pdlService.barn(any()) } returns listOf(
-            HentPersonBolkResult(
-                ident = "123456789",
-                person = PersonBarn(
-                    doedsfall = listOf(),
-                    adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
-                    folkeregisteridentifikator = listOf(
-                        FolkeregisteridentifikatorBarn(
-                            relatertPersonsIdent
-                        )
+        coEvery { pdlService.barn(any(), any()) } returns listOf(
+            PersonBarn(
+                doedsfall = listOf(),
+                adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
+                folkeregisteridentifikator = listOf(
+                    FolkeregisteridentifikatorBarn(
+                        relatertPersonsIdent
                     )
-                ),
-                code = "200"
+                )
             )
         )
 
-        val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken)
+        val barnOppslagRespons: List<TilgangResponse> =
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
-        assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(barnOppslagRespons).isNotNull()
+        assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
+        assertThat(barnOppslagRespons[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
@@ -108,7 +106,7 @@ class TilgangskontrollServiceTest {
     fun `gitt NAV-bruker uten adressebeskyttelse, forvent nektet tilgang til barn med adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any()) } returns Person(
+        coEvery { pdlService.person(any(), any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(),
@@ -122,20 +120,16 @@ class TilgangskontrollServiceTest {
             foedsel = listOf(Foedsel("1990-09-27"))
         )
 
-        coEvery { pdlService.barn(any()) } returns listOf(
-            HentPersonBolkResult(
-                ident = "123456789",
-                person = PersonBarn(
-                    doedsfall = listOf(),
-                    adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
-                    folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
-                ),
-                code = "200"
+        coEvery { pdlService.barn(any(), any()) } returns listOf(
+            PersonBarn(
+                doedsfall = listOf(),
+                adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
             )
         )
 
         val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken)
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -152,7 +146,7 @@ class TilgangskontrollServiceTest {
     fun `gitt NAV-bruker med relasjoner, forvent nektet tilgang til ukjent barn`() {
         val ukjentRelasjonIdent = "456"
 
-        coEvery { pdlService.person(any()) } returns Person(
+        coEvery { pdlService.person(any(), any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(),
@@ -166,24 +160,20 @@ class TilgangskontrollServiceTest {
             foedsel = listOf(Foedsel("1990-09-27"))
         )
 
-        coEvery { pdlService.barn(any()) } returns listOf(
-            HentPersonBolkResult(
-                ident = "123456789",
-                person = PersonBarn(
-                    doedsfall = listOf(),
-                    adressebeskyttelse = listOf(),
-                    folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(ukjentRelasjonIdent))
-                ),
-                code = "200"
+        coEvery { pdlService.barn(any(), any()) } returns listOf(
+            PersonBarn(
+                doedsfall = listOf(),
+                adressebeskyttelse = listOf(),
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(ukjentRelasjonIdent))
             )
         )
 
-        val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken)
+        val barnOppslagRespons =
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken, jwtToken)
 
-        assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(barnOppslagRespons).isNotNull()
+        assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(barnOppslagRespons[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
@@ -196,7 +186,7 @@ class TilgangskontrollServiceTest {
     fun `gitt NAV-bruker uten adressebeskyttelse, forvent tilgang til barn uten adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any()) } returns Person(
+        coEvery { pdlService.person(any(), any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(),
@@ -210,24 +200,20 @@ class TilgangskontrollServiceTest {
             foedsel = listOf(Foedsel("1990-09-27"))
         )
 
-        coEvery { pdlService.barn(any()) } returns listOf(
-            HentPersonBolkResult(
-                ident = "123456789",
-                person = PersonBarn(
-                    doedsfall = listOf(),
-                    adressebeskyttelse = listOf(),
-                    folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
-                ),
-                code = "200"
+        coEvery { pdlService.barn(any(), any()) } returns listOf(
+            PersonBarn(
+                doedsfall = listOf(),
+                adressebeskyttelse = listOf(),
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
             )
         )
 
-        val policyEvaluation =
-            tilgangskontrollService.hentTilgangTilBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken)
+        val barnOppslagRespons =
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
-        assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(barnOppslagRespons).isNotNull()
+        assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
+        assertThat(barnOppslagRespons[0].policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
@@ -239,7 +225,7 @@ class TilgangskontrollServiceTest {
     @Test
     fun `gitt NAV-bruker ikke lenger er i live, forvent nektet tilgang`() {
 
-        coEvery { pdlService.person(any()) } returns Person(
+        coEvery { pdlService.person(any(), any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(Doedsfall(LocalDateTime.now().toString())),
@@ -247,11 +233,11 @@ class TilgangskontrollServiceTest {
             foedsel = listOf(Foedsel("1990-09-27"))
         )
 
-        val policyEvaluation = tilgangskontrollService.hentTilgangTilPerson(jwtToken)
+        val personOppslagRespons = tilgangService.hentPerson(jwtToken)
 
-        assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(personOppslagRespons).isNotNull()
+        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(personOppslagRespons.policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.DENY),
                 PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.PERMIT)
@@ -262,7 +248,7 @@ class TilgangskontrollServiceTest {
     @Test
     fun `gitt NAV-bruker er under myndighetsalder (18), forvent nektet tilgang`() {
 
-        coEvery { pdlService.person(any()) } returns Person(
+        coEvery { pdlService.person(any(), any()) } returns Person(
             folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
             adressebeskyttelse = listOf(),
             doedsfall = listOf(),
@@ -270,11 +256,11 @@ class TilgangskontrollServiceTest {
             foedsel = listOf(Foedsel(LocalDate.now().minusDays(17).toString()))
         )
 
-        val policyEvaluation = tilgangskontrollService.hentTilgangTilPerson(jwtToken)
+        val personOppslagRespons = tilgangService.hentPerson(jwtToken)
 
-        assertThat(policyEvaluation).isNotNull()
-        assertThat(policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(policyEvaluation.children.resultat()).isEqualTo(
+        assertThat(personOppslagRespons).isNotNull()
+        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(personOppslagRespons.policyEvaluation.children.resultat()).isEqualTo(
             listOf(
                 PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.DENY)
