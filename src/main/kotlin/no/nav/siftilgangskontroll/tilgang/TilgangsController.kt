@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(TILGANG)
 @ProtectedWithClaims(issuer = "tokenx")
 class TilgangsController(
-    private val contextHolder: TokenValidationContextHolder,
     private val oppslagsService: OppslagsService,
     private val pdlAuthService: PdlAuthService
 ) {
@@ -36,9 +35,8 @@ class TilgangsController(
     @Protected
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<PersonTilgangResponse> {
-        val bearerToken = contextHolder.bearerToken()
         val personOppslagRespons =
-            oppslagsService.hentPerson(bearerToken)
+            oppslagsService.hentPerson(JwtToken(pdlAuthService.borgerToken()))
         logger.info("Hentet tilgang: {}", personOppslagRespons)
 
         return personOppslagRespons.somResponseEntity()
