@@ -11,12 +11,12 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
-import no.nav.policy.spesification.PolicyDecision
-import no.nav.policy.spesification.PolicyEvaluation
+import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
+import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
 import no.nav.siftilgangskontroll.core.pdl.PdlService
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
-import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangResponse
 import no.nav.siftilgangskontroll.core.tilgang.OppslagsService
+import no.nav.siftilgangskontroll.core.tilgang.TilgangResponse
 import no.nav.siftilgangskontroll.utils.hentToken
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -88,7 +88,7 @@ class OppslagsServiceTest {
             )
         )
 
-        val barnOppslagRespons: List<BarnTilgangResponse> =
+        val barnOppslagRespons: List<TilgangResponse> =
             oppslagsService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
         assertThat(barnOppslagRespons).isNotNull()

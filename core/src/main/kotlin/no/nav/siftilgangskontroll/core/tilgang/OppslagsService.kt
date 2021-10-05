@@ -1,8 +1,7 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
-import no.nav.policy.spesification.PolicyEvaluation
 import no.nav.security.token.support.core.jwt.JwtToken
-import no.nav.policy.spesification.evaluate
+import no.nav.siftilgangskontroll.policy.spesification.evaluate
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
@@ -19,7 +18,7 @@ class OppslagsService(
         private val logger = LoggerFactory.getLogger(OppslagsService::class.java)
     }
 
-    fun hentBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken, systemToken: JwtToken): List<BarnTilgangResponse> {
+    fun hentBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken, systemToken: JwtToken): List<TilgangResponse> {
 
         val hentBarnContext = tilgangsAttributter.hentBarnContext(
             bearerToken,
@@ -30,19 +29,19 @@ class OppslagsService(
         return hentBarnContext.barn.barn.map { barn ->
             evaluate(
                 ctx = hentBarnContext,
-                policy = `Barn er i live`(barn.personIdent())
-                        and `NAV-bruker har tilgang relasjon`(barn.personIdent())
-                        and `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barn.personIdent()),
-                block = { BarnTilgangResponse(barn, it) })
+                policy = `Barn er i live`(barn.ident())
+                        and `NAV-bruker har tilgang relasjon`(barn.ident())
+                        and `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barn.ident()),
+                block = { TilgangResponse(barn.ident(), it) })
         }
     }
 
-    fun hentPerson(bearerToken: JwtToken): PersonTilgangResponse {
+    fun hentPerson(bearerToken: JwtToken): TilgangResponse {
         val personContext = tilgangsAttributter.hentPersonContext(bearerToken)
         return evaluate(
             ctx = personContext,
             policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
-            block = { PersonTilgangResponse(personContext.borger.person, it) })
+            block = { TilgangResponse(personContext.borger.person.ident(), it) })
     }
 }
 

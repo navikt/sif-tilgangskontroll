@@ -1,9 +1,9 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
-import no.nav.policy.spesification.Policy
-import no.nav.policy.spesification.PolicyDecision
-import no.nav.policy.spesification.equalTo
+import no.nav.siftilgangskontroll.policy.spesification.Policy
+import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
+import no.nav.siftilgangskontroll.policy.spesification.equalTo
 import no.nav.siftilgangskontroll.core.pdl.PdlService
 import org.slf4j.Logger
 

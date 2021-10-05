@@ -45,3 +45,4 @@ fun Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
     .contains(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
 
 fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
+fun Person.ident() = folkeregisteridentifikator.first().identifikasjonsnummer

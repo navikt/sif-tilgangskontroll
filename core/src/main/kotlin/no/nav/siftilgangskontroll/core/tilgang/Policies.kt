@@ -1,9 +1,9 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
-import no.nav.policy.spesification.Policy
-import no.nav.policy.spesification.Policy.Companion.policy
-import no.nav.policy.spesification.PolicyEvaluation.Companion.deny
-import no.nav.policy.spesification.PolicyEvaluation.Companion.permit
+import no.nav.siftilgangskontroll.policy.spesification.Policy
+import no.nav.siftilgangskontroll.policy.spesification.Policy.Companion.policy
+import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation.Companion.deny
+import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation.Companion.permit
 import org.slf4j.LoggerFactory
 
 /**

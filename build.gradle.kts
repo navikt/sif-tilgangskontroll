@@ -73,7 +73,7 @@ ext["okhttp3.version"] = okHttp3Version
 
 dependencies {
     implementation(project(":spesification"))
-    implementation(project(":sif-tilgangskontroll-core"))
+    implementation(project(":core"))
 
     // NAV
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")

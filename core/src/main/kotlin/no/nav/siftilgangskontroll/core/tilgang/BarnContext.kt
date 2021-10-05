@@ -50,4 +50,4 @@ fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
 fun List<Person>.filtererPåIdent(ident: BarnIdent) =
     first { it.folkeregisteridentifikator.first().identifikasjonsnummer == ident }
 
-fun Person.personIdent() = folkeregisteridentifikator.first().identifikasjonsnummer
+fun Person.ident() = folkeregisteridentifikator.first().identifikasjonsnummer
