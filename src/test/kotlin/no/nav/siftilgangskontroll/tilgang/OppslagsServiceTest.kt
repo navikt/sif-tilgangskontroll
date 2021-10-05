@@ -10,7 +10,6 @@ import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.policy.spesification.PolicyDecision
 import no.nav.policy.spesification.PolicyEvaluation

@@ -2,7 +2,6 @@ package no.nav.siftilgangskontroll.tilgang
 
 import no.nav.security.token.support.core.api.Protected
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
@@ -13,7 +12,6 @@ import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangResponse
 import no.nav.siftilgangskontroll.core.tilgang.OppslagsService
 import no.nav.siftilgangskontroll.core.tilgang.PersonTilgangResponse
 import no.nav.siftilgangskontroll.pdl.PdlAuthService
-import no.nav.siftilgangskontroll.util.bearerToken
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType
