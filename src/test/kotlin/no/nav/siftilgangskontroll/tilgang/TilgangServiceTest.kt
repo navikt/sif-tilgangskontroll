@@ -15,7 +15,7 @@ import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
 import no.nav.siftilgangskontroll.core.pdl.PdlService
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
-import no.nav.siftilgangskontroll.core.tilgang.OppslagsService
+import no.nav.siftilgangskontroll.core.tilgang.TilgangService
 import no.nav.siftilgangskontroll.core.tilgang.TilgangResponse
 import no.nav.siftilgangskontroll.utils.hentToken
 import org.junit.jupiter.api.BeforeEach
@@ -39,10 +39,10 @@ import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as PersonBarn
 @ActiveProfiles("test")
 @EnableMockOAuth2Server // Tilgjengliggjør en oicd-provider for test.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
-class OppslagsServiceTest {
+class TilgangServiceTest {
 
     @Autowired
-    private lateinit var oppslagsService: OppslagsService
+    private lateinit var tilgangService: TilgangService
 
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
@@ -89,7 +89,7 @@ class OppslagsServiceTest {
         )
 
         val barnOppslagRespons: List<TilgangResponse> =
-            oppslagsService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
         assertThat(barnOppslagRespons).isNotNull()
         assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
@@ -129,7 +129,7 @@ class OppslagsServiceTest {
         )
 
         val policyEvaluation =
-            oppslagsService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -169,7 +169,7 @@ class OppslagsServiceTest {
         )
 
         val barnOppslagRespons =
-            oppslagsService.hentBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken, jwtToken)
 
         assertThat(barnOppslagRespons).isNotNull()
         assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -209,7 +209,7 @@ class OppslagsServiceTest {
         )
 
         val barnOppslagRespons =
-            oppslagsService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
         assertThat(barnOppslagRespons).isNotNull()
         assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
@@ -233,7 +233,7 @@ class OppslagsServiceTest {
             foedsel = listOf(Foedsel("1990-09-27"))
         )
 
-        val personOppslagRespons = oppslagsService.hentPerson(jwtToken)
+        val personOppslagRespons = tilgangService.hentPerson(jwtToken)
 
         assertThat(personOppslagRespons).isNotNull()
         assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -256,7 +256,7 @@ class OppslagsServiceTest {
             foedsel = listOf(Foedsel(LocalDate.now().minusDays(17).toString()))
         )
 
-        val personOppslagRespons = oppslagsService.hentPerson(jwtToken)
+        val personOppslagRespons = tilgangService.hentPerson(jwtToken)
 
         assertThat(personOppslagRespons).isNotNull()
         assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)

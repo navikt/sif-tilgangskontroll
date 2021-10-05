@@ -10,12 +10,12 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker uten adresse
 import org.slf4j.LoggerFactory
 
 
-class OppslagsService(
+class TilgangService(
     private val tilgangsAttributter: TilgangsAttributter
 ) {
 
     private companion object {
-        private val logger = LoggerFactory.getLogger(OppslagsService::class.java)
+        private val logger = LoggerFactory.getLogger(TilgangService::class.java)
     }
 
     fun hentBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken, systemToken: JwtToken): List<TilgangResponse> {
