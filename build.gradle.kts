@@ -65,7 +65,7 @@ allprojects {
 
 
             // Jackson
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
+            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
         }
     }
 
