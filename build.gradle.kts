@@ -103,11 +103,11 @@ subprojects {
 ext["okhttp3.version"] = okHttp3Version
 
 dependencies {
-    /*implementation(project(":spesification"))
-    implementation(project(":core"))*/
+    implementation(project(":spesification"))
+    implementation(project(":core"))
 
-    implementation("no.nav.sif.tilgangskontroll:spesification:1-975d695")
-    implementation("no.nav.sif.tilgangskontroll:core:1-975d695")
+    /*implementation("no.nav.sif.tilgangskontroll:spesification:1-25a6045")
+    implementation("no.nav.sif.tilgangskontroll:core:1-25a6045")*/
 
     // NAV
     implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")

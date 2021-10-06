@@ -51,11 +51,11 @@ class TilgangServiceTest {
     @MockkBean
     private lateinit var pdlService: PdlService
 
-    private lateinit var jwtToken: JwtToken
+    private lateinit var jwtToken: String
 
     @BeforeEach
     internal fun setUp() {
-        jwtToken = JwtToken(mockOAuth2Server.hentToken().serialize())
+        jwtToken = mockOAuth2Server.hentToken().serialize()
     }
 
     @Test

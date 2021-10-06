@@ -18,11 +18,11 @@ class TilgangService(
         private val logger = LoggerFactory.getLogger(TilgangService::class.java)
     }
 
-    fun hentBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: JwtToken, systemToken: JwtToken): List<TilgangResponse> {
+    fun hentBarn(barnTilgangForespørsel: BarnTilgangForespørsel, bearerToken: String, systemToken: String): List<TilgangResponse> {
 
         val hentBarnContext = tilgangsAttributter.hentBarnContext(
-            bearerToken,
-            systemToken,
+            JwtToken(bearerToken),
+            JwtToken(systemToken),
             barnTilgangForespørsel
         )
 
@@ -36,8 +36,8 @@ class TilgangService(
         }
     }
 
-    fun hentPerson(bearerToken: JwtToken): TilgangResponse {
-        val personContext = tilgangsAttributter.hentPersonContext(bearerToken)
+    fun hentPerson(bearerToken: String): TilgangResponse {
+        val personContext = tilgangsAttributter.hentPersonContext(JwtToken(bearerToken))
         return evaluate(
             ctx = personContext,
             policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),

@@ -1,13 +1,9 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
     id("com.expediagroup.graphql")  version "4.2.0"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_11
-
-val logstashLogbackEncoderVersion by extra("6.6")
 val tokenSupportVersion by extra("1.3.8")
 val okHttp3Version by extra("4.9.1")
 val graphQLKotlinVersion by extra("4.2.0")

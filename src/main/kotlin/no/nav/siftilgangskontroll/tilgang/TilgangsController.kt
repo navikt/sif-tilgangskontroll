@@ -33,7 +33,7 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<TilgangResponse> {
         val personOppslagRespons =
-            tilgangService.hentPerson(JwtToken(pdlAuthService.borgerToken()))
+            tilgangService.hentPerson(pdlAuthService.borgerToken())
         logger.info("Hentet tilgang: {}", personOppslagRespons)
 
         return personOppslagRespons.somResponseEntity()
@@ -44,7 +44,7 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<TilgangResponse>> {
         val barnOppslagRespons =
-            tilgangService.hentBarn(barnTilgangForespørsel, JwtToken(pdlAuthService.borgerToken()), JwtToken(pdlAuthService.systemToken()))
+            tilgangService.hentBarn(barnTilgangForespørsel, pdlAuthService.borgerToken(), pdlAuthService.systemToken())
         logger.info("Hentet tilgang: {}", barnOppslagRespons)
 
         return barnOppslagRespons.somResponseEntity()
