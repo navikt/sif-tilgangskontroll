@@ -1,24 +1,29 @@
-package no.nav.siftilgangskontroll.core.pdl
+package no.nav.siftilgangskontroll.pdl
 
 import com.expediagroup.graphql.client.spring.GraphQLWebClient
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
 import reactor.netty.http.client.HttpClientRequest
 import reactor.netty.http.client.HttpClientResponse
 
+@Configuration
 class PdlClientConfig(
-   private val pdlBaseUrl: String,
-   private val builder: WebClient.Builder = defaultWebClientBuilder()
+    @Value("\${no.nav.gateways.pdl-api-base-url}") private val pdlBaseUrl: String,
 ) {
 
-    val client: GraphQLWebClient = pdlClient()
-
-    companion object {
+    private companion object {
         private val logger = LoggerFactory.getLogger(PdlClientConfig::class.java)
+    }
 
-        fun defaultWebClientBuilder() = WebClient.builder()
+    @Bean
+    fun pdlClient() = GraphQLWebClient(
+        url = "${pdlBaseUrl}/graphql",
+        builder = WebClient.builder()
             .clientConnector(
                 ReactorClientHttpConnector(
                     HttpClient.create()
@@ -39,10 +44,5 @@ class PdlClientConfig(
             .defaultRequest {
                 it.header("Tema", "OMS")
             }
-    }
-
-    private fun pdlClient() = GraphQLWebClient(
-        url = "${pdlBaseUrl}/graphql",
-        builder = builder
     )
 }

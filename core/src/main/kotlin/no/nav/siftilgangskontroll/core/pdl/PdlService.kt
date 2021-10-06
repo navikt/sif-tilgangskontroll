@@ -1,6 +1,10 @@
 package no.nav.siftilgangskontroll.core.pdl
 
+import com.expediagroup.graphql.client.GraphQLClient
+import com.expediagroup.graphql.client.spring.GraphQLWebClient
+import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.ktor.client.request.*
 import no.nav.siftilgangskontroll.pdl.generated.HentBarn
 import no.nav.siftilgangskontroll.pdl.generated.HentPerson
 import no.nav.siftilgangskontroll.pdl.generated.ID
@@ -9,7 +13,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 
 class PdlService(
-    private val pdlClientConfig: PdlClientConfig,
+    private val graphQLClient: GraphQLClient<*>,
 ) {
 
     private companion object {
@@ -19,8 +23,14 @@ class PdlService(
     }
 
     suspend fun person(ident: String, borgerToken: String): Person {
-        val result = pdlClientConfig.client.execute(HentPerson(HentPerson.Variables(ident))) {
-            header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
+        val result = when(graphQLClient) {
+            is GraphQLWebClient -> graphQLClient.execute(HentPerson(HentPerson.Variables(ident))) {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
+            }
+            is GraphQLKtorClient -> graphQLClient.execute(HentPerson(HentPerson.Variables(ident))) {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
+            }
+            else -> throw Exception("Instance of GraphQLClient is not supported")
         }
 
         return when {
@@ -37,8 +47,14 @@ class PdlService(
     }
 
     suspend fun barn(identer: List<ID>, systemToken: String): List<no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person> {
-        val result = pdlClientConfig.client.execute(HentBarn(HentBarn.Variables(identer))) {
-            header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
+        val result = when(graphQLClient) {
+            is GraphQLWebClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
+            }
+            is GraphQLKtorClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
+            }
+            else -> throw Exception("Instance of GraphQLClient is not supported")
         }
 
         return when {

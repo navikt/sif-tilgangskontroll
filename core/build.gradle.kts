@@ -19,6 +19,9 @@ dependencies {
 
     //graphql
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
+    implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
+        exclude("com.expediagroup", "graphql-kotlin-client-serialization")
+    }
 }
 
 tasks.withType<com.expediagroup.graphql.plugin.gradle.tasks.GraphQLGenerateClientTask> {
