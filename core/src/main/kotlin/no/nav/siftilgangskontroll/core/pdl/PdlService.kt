@@ -50,11 +50,9 @@ class PdlService(
         val result = when(graphQLClient) {
             is GraphQLWebClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
-                header("Nav-Consumer-Token", "Bearer $systemToken")
             }
             is GraphQLKtorClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
-                header("Nav-Consumer-Token", "Bearer $systemToken")
             }
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
