@@ -63,8 +63,8 @@ object Policies {
             description = "Tilgang skal nektes til barn som er over 18 år."
             evaluation = {
                 when (barn.erMyndig(ident)) {
-                    true -> permit("Barn er under myndighetsalder")
-                    else -> deny("Barn er over myndighetsalder")
+                    true -> deny("Barn er over myndighetsalder")
+                    else -> permit("Barn er under myndighetsalder ")
                 }
             }
         }
