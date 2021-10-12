@@ -5,6 +5,9 @@ query($identer: [ID!]!) {
             folkeregisteridentifikator(historikk: false){
                 identifikasjonsnummer
             }
+            foedsel {
+                foedselsdato
+            }
             doedsfall {
                 doedsdato
             }

@@ -5,8 +5,9 @@ import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.pdl.generated.ID
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person
+import java.time.LocalDate
+import java.time.Period
 
 data class Barn(
     val barnIdent: List<ID>,
@@ -22,6 +23,18 @@ data class Barn(
     fun erDød(ident: BarnIdent) = barn
         .filtererPåIdent(ident)
         .erDød()
+
+    fun fødselsdato(ident: BarnIdent): LocalDate = barn
+        .filtererPåIdent(ident)
+        .fødselsdato()
+
+    fun erMyndig(ident: BarnIdent): Boolean {
+        val alder = Period.between(fødselsdato(ident), LocalDate.now()).years
+        return when {
+            alder >= MYNDIG_ALDER -> true
+            else -> false
+        }
+    }
 }
 
 data class HentBarnContext(
@@ -46,6 +59,7 @@ fun Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
     .contains(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
 
 fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
+fun Person.fødselsdato(): LocalDate = LocalDate.parse(foedsel.first().foedselsdato!!)
 
 fun List<Person>.filtererPåIdent(ident: BarnIdent) =
     first { it.folkeregisteridentifikator.first().identifikasjonsnummer == ident }

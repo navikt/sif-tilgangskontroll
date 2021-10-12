@@ -57,6 +57,18 @@ object Policies {
             }
         }
 
+    fun `Barn er under myndighetsalder`(ident: BarnIdent): Policy<HentBarnContext> =
+        policy {
+            id = "SIF.4"
+            description = "Tilgang skal nektes til barn som er over 18 år."
+            evaluation = {
+                when (barn.erMyndig(ident)) {
+                    true -> deny("Barn er over myndighetsalder")
+                    else -> permit("Barn er under myndighetsalder ")
+                }
+            }
+        }
+
     fun `NAV-bruker er i live`(): Policy<HentPersonContext> =
         policy {
             id = "FP.10"

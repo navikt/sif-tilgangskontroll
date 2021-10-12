@@ -3,6 +3,7 @@ package no.nav.siftilgangskontroll.core.tilgang
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.policy.spesification.evaluate
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er i live`
+import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er under myndighetsalder`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang relasjon`
@@ -30,6 +31,7 @@ class TilgangService(
             evaluate(
                 ctx = hentBarnContext,
                 policy = `Barn er i live`(barn.ident())
+                        and `Barn er under myndighetsalder`(barn.ident())
                         and `NAV-bruker har tilgang relasjon`(barn.ident())
                         and `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barn.ident()),
                 block = { TilgangResponse(barn.ident(), it) })
