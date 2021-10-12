@@ -30,6 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as AdressebeskyttelseBarn
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedsel as BarnFoedsel
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as FolkeregisteridentifikatorBarn
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as PersonBarn
 
@@ -84,7 +85,8 @@ class TilgangServiceTest {
                     FolkeregisteridentifikatorBarn(
                         relatertPersonsIdent
                     )
-                )
+                ),
+                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
         )
 
@@ -97,7 +99,8 @@ class TilgangServiceTest {
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT)
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.PERMIT)
             )
         )
     }
@@ -124,7 +127,8 @@ class TilgangServiceTest {
             PersonBarn(
                 doedsfall = listOf(),
                 adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent)),
+                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
         )
 
@@ -137,7 +141,50 @@ class TilgangServiceTest {
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.DENY),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT)
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.PERMIT)
+            )
+        )
+    }
+
+    @Test
+    fun `gitt NAV-bruker, forvent nektet tilgang til barn over myndighetsalder (18)`() {
+        val relatertPersonsIdent = "123"
+
+        coEvery { pdlService.person(any(), any()) } returns Person(
+            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
+            adressebeskyttelse = listOf(),
+            doedsfall = listOf(),
+            forelderBarnRelasjon = listOf(
+                ForelderBarnRelasjon(
+                    relatertPersonsIdent = relatertPersonsIdent,
+                    relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
+                    minRolleForPerson = null
+                )
+            ),
+            foedsel = listOf(Foedsel("1990-09-27"))
+        )
+
+        coEvery { pdlService.barn(any(), any()) } returns listOf(
+            PersonBarn(
+                doedsfall = listOf(),
+                adressebeskyttelse = listOf(),
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent)),
+                foedsel = listOf(BarnFoedsel("2002-01-01"))
+            )
+        )
+
+        val policyEvaluation =
+            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+
+        assertThat(policyEvaluation).isNotNull()
+        assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(policyEvaluation[0].policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.DENY)
             )
         )
     }
@@ -164,7 +211,8 @@ class TilgangServiceTest {
             PersonBarn(
                 doedsfall = listOf(),
                 adressebeskyttelse = listOf(),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(ukjentRelasjonIdent))
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(ukjentRelasjonIdent)),
+                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
         )
 
@@ -177,7 +225,8 @@ class TilgangServiceTest {
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.DENY)
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.DENY),
+                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.PERMIT)
             )
         )
     }
@@ -204,7 +253,8 @@ class TilgangServiceTest {
             PersonBarn(
                 doedsfall = listOf(),
                 adressebeskyttelse = listOf(),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent))
+                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent)),
+                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
         )
 
@@ -217,7 +267,8 @@ class TilgangServiceTest {
             listOf(
                 PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT)
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.PERMIT)
             )
         )
     }
