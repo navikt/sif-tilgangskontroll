@@ -27,6 +27,7 @@ val guavaVersion by extra("23.0")
 val okHttp3Version by extra("4.9.1")
 val orgJsonVersion by extra("20210307")
 val graphQLKotlinVersion by extra("4.2.0")
+val jacksonKotlinModuleVersion by extra("2.12.5")
 
 configurations {
     compileOnly {
@@ -65,7 +66,7 @@ allprojects {
 
 
             // Jackson
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
+            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonKotlinModuleVersion")
         }
     }
 
