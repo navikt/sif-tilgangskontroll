@@ -63,45 +63,6 @@ class TilgangServiceTest {
     }
 
     @Test
-    fun `gitt NAV-bruker med adressebeskyttelse, forvent tilgang til barn med adressebeskyttelse`() {
-        val relatertPersonsIdent = "123"
-
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
-            pdlHentPersonResponse(
-                person = defaultHentPersonResult(
-                    adressebeskyttelse = Adressebeskyttelse(STRENGT_FORTROLIG),
-                    relatertPersonsIdent = relatertPersonsIdent
-                )
-            )
-        }
-
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
-            pdlHentPersonBolkResponse(
-                personBolk = listOf(
-                    defaultHentPersonBolkResult(
-                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
-                        adressebeskyttelse = BarnAdressebeskyttelse(STRENGT_FORTROLIG)
-                    )
-                )
-            )
-        }
-
-        val barnOppslagRespons: List<TilgangResponseBarn> =
-            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
-
-        assertThat(barnOppslagRespons).isNotNull()
-        assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(barnOppslagRespons[0].policyEvaluation.children.resultat()).isEqualTo(
-            listOf(
-                PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.PERMIT)
-            )
-        )
-    }
-
-    @Test
     fun `gitt NAV-bruker uten adressebeskyttelse, forvent nektet tilgang til barn med adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 

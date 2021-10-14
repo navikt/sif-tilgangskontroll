@@ -17,16 +17,15 @@ object Policies {
 
     private val logger = LoggerFactory.getLogger(Policies::class.java)
 
-    internal fun `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barnIdent: BarnIdent): Policy<BarnContext> =
+    internal fun `Barn er ikke adressebeskyttet`(barnIdent: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.1"
-            description = "NAV-Bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse"
+            description = "NAV-Bruker skal ikke ha tilgang til barn med adressebeskyttelse"
             evaluation = {
-                val borgerHarStrengtFortroligAdresse = pdlPerson.harStrengtFortroligAdresse()
                 val barnHarStrengtFortroligAdresse: Boolean = pdlBarn.harStrengtFortroligAdresse(barnIdent)
 
                 when {
-                    !borgerHarStrengtFortroligAdresse && barnHarStrengtFortroligAdresse -> deny("NAV-bruker har ikke tilgang til barn med adressebeskyttelse")
+                   barnHarStrengtFortroligAdresse -> deny("NAV-bruker har ikke tilgang til barn med adressebeskyttelse")
                     else -> permit("NAV-bruker har tilgang til barn")
                 }
             }
@@ -46,7 +45,7 @@ object Policies {
         }
 
     // TODO: 23/09/2021 Mulig med fullmakt kanskje?
-    internal fun `NAV-bruker har tilgang relasjon`(barnIdent: BarnIdent): Policy<BarnContext> =
+    internal fun `NAV-bruker har tilgang barn`(barnIdent: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.3"
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
