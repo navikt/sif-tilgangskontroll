@@ -1,7 +1,8 @@
-package no.nav.siftilgangskontroll.core.tilgang
+package no.nav.siftilgangskontroll.core.pdl
 
 import kotlinx.coroutines.runBlocking
 import no.nav.security.token.support.core.jwt.JwtToken
+import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
 import no.nav.siftilgangskontroll.pdl.generated.ID
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse
@@ -9,12 +10,14 @@ import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person
 import java.time.LocalDate
 import java.time.Period
 
-data class Barn(
+typealias BarnIdent = String
+
+data class PdlBarn(
+    private val pdlService: PdlService,
     val barnIdent: List<ID>,
-    val systemToken: String,
-    val tilgangsAttributter: TilgangsAttributter
+    val systemToken: String
 ) {
-    val barn = runBlocking { tilgangsAttributter.pdlService.barn(barnIdent, systemToken) }
+    val barn = runBlocking { pdlService.barn(barnIdent, systemToken) }
 
     fun harStrengtFortroligAdresse(ident: BarnIdent): Boolean = barn
         .filtererPåIdent(ident)
@@ -37,21 +40,22 @@ data class Barn(
     }
 }
 
-data class HentBarnContext(
+internal data class BarnContext(
     val barnTilgangForespørsel: BarnTilgangForespørsel,
+    val pdlService: PdlService,
     private val bearerToken: JwtToken,
-    private val systemtoken: JwtToken,
-    private val tilgangsAttributter: TilgangsAttributter
+    private val systemtoken: JwtToken
 ) {
-    val borger = Borger(
+    val pdlPerson = PdlPerson(
         borgerToken = bearerToken.tokenAsString,
-        tilgangsAttributter = tilgangsAttributter
+        pdlService = pdlService
+
     )
 
-    val barn = Barn(
+    val pdlBarn = PdlBarn(
+        pdlService = pdlService,
         barnIdent = barnTilgangForespørsel.barnIdenter,
-        systemToken = systemtoken.tokenAsString,
-        tilgangsAttributter = tilgangsAttributter
+        systemToken = systemtoken.tokenAsString
     )
 }
 

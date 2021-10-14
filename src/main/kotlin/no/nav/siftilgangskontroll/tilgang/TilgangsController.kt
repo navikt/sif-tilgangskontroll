@@ -6,10 +6,10 @@ import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
-import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
+import no.nav.siftilgangskontroll.core.tilgang.TilgangResponseBarn
 import no.nav.siftilgangskontroll.core.tilgang.TilgangService
-import no.nav.siftilgangskontroll.core.tilgang.TilgangResponse
+import no.nav.siftilgangskontroll.core.tilgang.TilgangResponsePerson
 import no.nav.siftilgangskontroll.pdl.PdlAuthService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*
@@ -31,7 +31,7 @@ class TilgangsController(
     @GetMapping(PERSON, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentTilgangTilPerson(): ResponseEntity<TilgangResponse> {
+    fun hentTilgangTilPerson(): ResponseEntity<TilgangResponsePerson> {
         val personOppslagRespons =
             tilgangService.hentPerson(pdlAuthService.borgerToken())
         logger.info("Hentet tilgang: {}", personOppslagRespons)
@@ -42,7 +42,7 @@ class TilgangsController(
     @PostMapping(BARN, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<TilgangResponse>> {
+    fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<TilgangResponseBarn>> {
         val barnOppslagRespons =
             tilgangService.hentBarn(barnTilgangForespørsel, pdlAuthService.borgerToken(), pdlAuthService.systemToken())
         logger.info("Hentet tilgang: {}", barnOppslagRespons)
@@ -51,10 +51,10 @@ class TilgangsController(
     }
 }
 
-fun TilgangResponse.somResponseEntity() = when(policyEvaluation.decision) {
+fun TilgangResponsePerson.somResponseEntity() = when(policyEvaluation.decision) {
     PolicyDecision.PERMIT -> ResponseEntity(this, OK)
     PolicyDecision.DENY -> ResponseEntity(this, FORBIDDEN)
     PolicyDecision.NOT_APPLICABLE -> ResponseEntity(INTERNAL_SERVER_ERROR)
 }
 
-fun List<TilgangResponse>.somResponseEntity() = ResponseEntity(this, OK)
+fun List<TilgangResponseBarn>.somResponseEntity() = ResponseEntity(this, OK)

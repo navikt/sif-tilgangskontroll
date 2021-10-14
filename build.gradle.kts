@@ -64,9 +64,10 @@ allprojects {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
 
-
             // Jackson
             implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonKotlinModuleVersion")
+
+            implementation("org.json:json:$orgJsonVersion")
         }
     }
 
@@ -151,7 +152,6 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
 
     // Diverse
-    implementation("org.json:json:$orgJsonVersion")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.zalando:problem-spring-web-starter:$zalandoVersion")
     implementation("com.google.guava:guava:$guavaVersion")

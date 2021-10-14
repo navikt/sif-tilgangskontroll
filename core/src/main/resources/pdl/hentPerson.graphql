@@ -3,6 +3,12 @@ query($ident: ID!){
         folkeregisteridentifikator(historikk: false){
             identifikasjonsnummer
         }
+        navn(historikk: false) {
+            fornavn
+            mellomnavn
+            etternavn
+            forkortetNavn
+        }
         foedsel {
             foedselsdato
         }
