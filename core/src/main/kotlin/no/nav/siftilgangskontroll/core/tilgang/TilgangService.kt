@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory
 
 /**
  * Denne klassens ansvar er å hente oppslagsdata, håndhevet gjennom et sett med policier.
- *
  */
 class TilgangService(
     private val pdlService: PdlService
@@ -35,6 +34,12 @@ class TilgangService(
      * - Barn er under myndighetsalder (18).
      * - NAV-bruker har tilgang til barn.
      * - Barn er ikke adressebeskyttet.
+     *
+     * @param barnTilgangForespørsel: Liste med identifikasjon på barn man ønsker oppslag på.
+     * @param bearerToken: Sluttbrukers token. Enten Azure OBO, eller tokenX.
+     * @param systemToken: Systemtoken hentet fra azure klient.
+     *
+     * @return TilgangResponseBarn: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
     fun hentBarn(
         barnTilgangForespørsel: BarnTilgangForespørsel,
@@ -74,6 +79,10 @@ class TilgangService(
      * For å få tilgang til person må følgende policier være oppfylt:
      * - NAV-bruker er i live.
      * - NAV-bruker er myndig.
+     *
+     * @param bearerToken: Sluttbrukers token. Enten Azure OBO, eller tokenX.
+     *
+     * @return TilgangResponsePerson: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
     fun hentPerson(bearerToken: String): TilgangResponsePerson {
         val personContext = HentPersonContext(bearerToken =JwtToken(bearerToken), pdlService = pdlService)
