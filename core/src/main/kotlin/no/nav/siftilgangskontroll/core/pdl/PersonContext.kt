@@ -1,4 +1,4 @@
-package no.nav.siftilgangskontroll.core.tilgang
+package no.nav.siftilgangskontroll.core.pdl
 
 import kotlinx.coroutines.runBlocking
 import no.nav.security.token.support.core.jwt.JwtToken
@@ -12,21 +12,21 @@ import java.time.Period
 
 const val MYNDIG_ALDER = 18
 
-data class HentPersonContext(
+internal data class HentPersonContext(
     private val bearerToken: JwtToken,
-    private val tilgangsAttributter: TilgangsAttributter
+    private val pdlService: PdlService
 ) {
-    val borger = Borger(
+    val pdlPerson = PdlPerson(
         borgerToken = bearerToken.tokenAsString,
-        tilgangsAttributter = tilgangsAttributter
+        pdlService = pdlService
     )
 }
 
-data class Borger(
-    val borgerToken: String,
-    val tilgangsAttributter: TilgangsAttributter
+data class PdlPerson(
+    private val pdlService: PdlService,
+    val borgerToken: String
 ) {
-    val person = runBlocking { tilgangsAttributter.pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken) }
+    val person = runBlocking { pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken) }
 
     fun harStrengtFortroligAdresse(): Boolean = person.harStrengtFortroligAdresse()
     fun erDød(): Boolean = person.erDød()

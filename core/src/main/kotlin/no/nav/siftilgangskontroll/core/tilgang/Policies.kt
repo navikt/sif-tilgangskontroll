@@ -1,5 +1,9 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
+import no.nav.siftilgangskontroll.core.pdl.BarnContext
+import no.nav.siftilgangskontroll.core.pdl.BarnIdent
+import no.nav.siftilgangskontroll.core.pdl.HentPersonContext
+import no.nav.siftilgangskontroll.core.pdl.MYNDIG_ALDER
 import no.nav.siftilgangskontroll.policy.spesification.Policy
 import no.nav.siftilgangskontroll.policy.spesification.Policy.Companion.policy
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation.Companion.deny
@@ -13,13 +17,13 @@ object Policies {
 
     private val logger = LoggerFactory.getLogger(Policies::class.java)
 
-    fun `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barnIdent: BarnIdent): Policy<HentBarnContext> =
+    internal fun `NAV-bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse`(barnIdent: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.1"
             description = "NAV-Bruker uten adressebeskyttelse skal ikke ha tilgang til barn med adressebeskyttelse"
             evaluation = {
-                val borgerHarStrengtFortroligAdresse = borger.harStrengtFortroligAdresse()
-                val barnHarStrengtFortroligAdresse: Boolean = barn.harStrengtFortroligAdresse(barnIdent)
+                val borgerHarStrengtFortroligAdresse = pdlPerson.harStrengtFortroligAdresse()
+                val barnHarStrengtFortroligAdresse: Boolean = pdlBarn.harStrengtFortroligAdresse(barnIdent)
 
                 when {
                     !borgerHarStrengtFortroligAdresse && barnHarStrengtFortroligAdresse -> deny("NAV-bruker har ikke tilgang til barn med adressebeskyttelse")
@@ -29,12 +33,12 @@ object Policies {
         }
 
 
-    fun `Barn er i live`(ident: BarnIdent): Policy<HentBarnContext> =
+    internal fun `Barn er i live`(ident: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.2"
             description = "Tilgang skal nektes til barn som ikke er i live."
             evaluation = {
-                when (barn.erDød(ident)) {
+                when (pdlBarn.erDød(ident)) {
                     true -> deny("Barn er ikke lenger i live")
                     else -> permit("Barn er i live")
                 }
@@ -42,13 +46,13 @@ object Policies {
         }
 
     // TODO: 23/09/2021 Mulig med fullmakt kanskje?
-    fun `NAV-bruker har tilgang relasjon`(barnIdent: BarnIdent): Policy<HentBarnContext> =
+    internal fun `NAV-bruker har tilgang relasjon`(barnIdent: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.3"
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
             evaluation = {
 
-                val erKjentRelasjon = borger.relasjoner().map { it.relatertPersonsIdent }.contains(barnIdent)
+                val erKjentRelasjon = pdlPerson.relasjoner().map { it.relatertPersonsIdent }.contains(barnIdent)
 
                 when {
                     erKjentRelasjon -> permit("Relasjon er kjent")
@@ -57,36 +61,36 @@ object Policies {
             }
         }
 
-    fun `Barn er under myndighetsalder`(ident: BarnIdent): Policy<HentBarnContext> =
+    internal fun `Barn er under myndighetsalder`(ident: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.4"
             description = "Tilgang skal nektes til barn som er over 18 år."
             evaluation = {
-                when (barn.erMyndig(ident)) {
+                when (pdlBarn.erMyndig(ident)) {
                     true -> deny("Barn er over myndighetsalder")
                     else -> permit("Barn er under myndighetsalder ")
                 }
             }
         }
 
-    fun `NAV-bruker er i live`(): Policy<HentPersonContext> =
+    internal fun `NAV-bruker er i live`(): Policy<HentPersonContext> =
         policy {
             id = "FP.10"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som ikke er i live."
             evaluation = {
-                when (borger.erDød()) {
+                when (pdlPerson.erDød()) {
                     true -> deny("NAV-bruker er ikke lenger i live")
                     else -> permit("NAV-bruker er i live")
                 }
             }
         }
 
-    fun `NAV-bruker er myndig`(): Policy<HentPersonContext> =
+    internal fun `NAV-bruker er myndig`(): Policy<HentPersonContext> =
         policy {
             id = "FP.11"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som er mindreårig (under $MYNDIG_ALDER år)."
             evaluation = {
-                when (borger.erMyndig()) {
+                when (pdlPerson.erMyndig()) {
                     true ->  permit("NAV-bruker er myndig")
                     else -> deny("NAV-bruker er ikke myndig")
                 }

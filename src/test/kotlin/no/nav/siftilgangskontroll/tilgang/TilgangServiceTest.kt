@@ -3,43 +3,45 @@ package no.nav.siftilgangskontroll.tilgang
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.coEvery
+import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
-import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
-import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
+import no.nav.siftilgangskontroll.core.pdl.utils.PdlOperasjon
+import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonBolkResponse
+import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonResponse
+import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
+import no.nav.siftilgangskontroll.core.tilgang.TilgangResponseBarn
+import no.nav.siftilgangskontroll.core.tilgang.TilgangService
+import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering.STRENGT_FORTROLIG
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
-import no.nav.siftilgangskontroll.core.pdl.PdlService
-import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
-import no.nav.siftilgangskontroll.core.tilgang.TilgangService
-import no.nav.siftilgangskontroll.core.tilgang.TilgangResponse
 import no.nav.siftilgangskontroll.utils.hentToken
+import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentPersonBolkResult
+import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentPersonResult
+import no.nav.siftilgangskontroll.wiremock.stubPdlRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
-import java.time.LocalDateTime
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as AdressebeskyttelseBarn
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedsel as BarnFoedsel
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as FolkeregisteridentifikatorBarn
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as PersonBarn
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedsel as BarnFødsel
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as BarnFolkeregisteridentifikator
 
 @ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DirtiesContext
 @ActiveProfiles("test")
 @EnableMockOAuth2Server // Tilgjengliggjør en oicd-provider for test.
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
+@AutoConfigureWireMock
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
 class TilgangServiceTest {
 
     @Autowired
@@ -49,8 +51,9 @@ class TilgangServiceTest {
     @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
 
-    @MockkBean
-    private lateinit var pdlService: PdlService
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+    @Autowired
+    private lateinit var wireMockServer: WireMockServer
 
     private lateinit var jwtToken: String
 
@@ -63,34 +66,27 @@ class TilgangServiceTest {
     fun `gitt NAV-bruker med adressebeskyttelse, forvent tilgang til barn med adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
-            doedsfall = listOf(),
-            forelderBarnRelasjon = listOf(
-                ForelderBarnRelasjon(
-                    relatertPersonsIdent = relatertPersonsIdent,
-                    relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
-                    minRolleForPerson = null
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    adressebeskyttelse = Adressebeskyttelse(STRENGT_FORTROLIG),
+                    relatertPersonsIdent = relatertPersonsIdent
                 )
-            ),
-            foedsel = listOf(Foedsel("1990-09-27"))
-        )
-
-        coEvery { pdlService.barn(any(), any()) } returns listOf(
-            PersonBarn(
-                doedsfall = listOf(),
-                adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
-                folkeregisteridentifikator = listOf(
-                    FolkeregisteridentifikatorBarn(
-                        relatertPersonsIdent
-                    )
-                ),
-                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
-        )
+        }
 
-        val barnOppslagRespons: List<TilgangResponse> =
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
+                        adressebeskyttelse = BarnAdressebeskyttelse(STRENGT_FORTROLIG)
+                    )
+                )
+            )
+        }
+
+        val barnOppslagRespons: List<TilgangResponseBarn> =
             tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
 
         assertThat(barnOppslagRespons).isNotNull()
@@ -109,28 +105,24 @@ class TilgangServiceTest {
     fun `gitt NAV-bruker uten adressebeskyttelse, forvent nektet tilgang til barn med adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(),
-            doedsfall = listOf(),
-            forelderBarnRelasjon = listOf(
-                ForelderBarnRelasjon(
-                    relatertPersonsIdent = relatertPersonsIdent,
-                    relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
-                    minRolleForPerson = null
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = relatertPersonsIdent
                 )
-            ),
-            foedsel = listOf(Foedsel("1990-09-27"))
-        )
-
-        coEvery { pdlService.barn(any(), any()) } returns listOf(
-            PersonBarn(
-                doedsfall = listOf(),
-                adressebeskyttelse = listOf(AdressebeskyttelseBarn(AdressebeskyttelseGradering.STRENGT_FORTROLIG)),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent)),
-                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
-        )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
+                        adressebeskyttelse = BarnAdressebeskyttelse(STRENGT_FORTROLIG)
+                    )
+                )
+            )
+        }
 
         val policyEvaluation =
             tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
@@ -151,28 +143,24 @@ class TilgangServiceTest {
     fun `gitt NAV-bruker, forvent nektet tilgang til barn over myndighetsalder (18)`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(),
-            doedsfall = listOf(),
-            forelderBarnRelasjon = listOf(
-                ForelderBarnRelasjon(
-                    relatertPersonsIdent = relatertPersonsIdent,
-                    relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
-                    minRolleForPerson = null
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = relatertPersonsIdent
                 )
-            ),
-            foedsel = listOf(Foedsel("1990-09-27"))
-        )
-
-        coEvery { pdlService.barn(any(), any()) } returns listOf(
-            PersonBarn(
-                doedsfall = listOf(),
-                adressebeskyttelse = listOf(),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent)),
-                foedsel = listOf(BarnFoedsel("2002-01-01"))
             )
-        )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
+                        fødselsdato = BarnFødsel("2002-01-01")
+                    )
+                )
+            )
+        }
 
         val policyEvaluation =
             tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
@@ -193,28 +181,23 @@ class TilgangServiceTest {
     fun `gitt NAV-bruker med relasjoner, forvent nektet tilgang til ukjent barn`() {
         val ukjentRelasjonIdent = "456"
 
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(),
-            doedsfall = listOf(),
-            forelderBarnRelasjon = listOf(
-                ForelderBarnRelasjon(
-                    relatertPersonsIdent = "123",
-                    relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
-                    minRolleForPerson = null
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = "123"
                 )
-            ),
-            foedsel = listOf(Foedsel("1990-09-27"))
-        )
-
-        coEvery { pdlService.barn(any(), any()) } returns listOf(
-            PersonBarn(
-                doedsfall = listOf(),
-                adressebeskyttelse = listOf(),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(ukjentRelasjonIdent)),
-                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
-        )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator("456")
+                    )
+                )
+            )
+        }
 
         val barnOppslagRespons =
             tilgangService.hentBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken, jwtToken)
@@ -235,28 +218,23 @@ class TilgangServiceTest {
     fun `gitt NAV-bruker uten adressebeskyttelse, forvent tilgang til barn uten adressebeskyttelse`() {
         val relatertPersonsIdent = "123"
 
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(),
-            doedsfall = listOf(),
-            forelderBarnRelasjon = listOf(
-                ForelderBarnRelasjon(
-                    relatertPersonsIdent = relatertPersonsIdent,
-                    relatertPersonsRolle = ForelderBarnRelasjonRolle.BARN,
-                    minRolleForPerson = null
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = relatertPersonsIdent
                 )
-            ),
-            foedsel = listOf(Foedsel("1990-09-27"))
-        )
-
-        coEvery { pdlService.barn(any(), any()) } returns listOf(
-            PersonBarn(
-                doedsfall = listOf(),
-                adressebeskyttelse = listOf(),
-                folkeregisteridentifikator = listOf(FolkeregisteridentifikatorBarn(relatertPersonsIdent)),
-                foedsel = listOf(BarnFoedsel("2020-01-01"))
             )
-        )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent)
+                    )
+                )
+            )
+        }
 
         val barnOppslagRespons =
             tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
@@ -275,14 +253,13 @@ class TilgangServiceTest {
 
     @Test
     fun `gitt NAV-bruker ikke lenger er i live, forvent nektet tilgang`() {
-
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(),
-            doedsfall = listOf(Doedsfall(LocalDateTime.now().toString())),
-            forelderBarnRelasjon = listOf(),
-            foedsel = listOf(Foedsel("1990-09-27"))
-        )
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    dødsdato = Doedsfall(LocalDate.now().toString())
+                )
+            )
+        }
 
         val personOppslagRespons = tilgangService.hentPerson(jwtToken)
 
@@ -299,13 +276,13 @@ class TilgangServiceTest {
     @Test
     fun `gitt NAV-bruker er under myndighetsalder (18), forvent nektet tilgang`() {
 
-        coEvery { pdlService.person(any(), any()) } returns Person(
-            folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
-            adressebeskyttelse = listOf(),
-            doedsfall = listOf(),
-            forelderBarnRelasjon = listOf(),
-            foedsel = listOf(Foedsel(LocalDate.now().minusDays(17).toString()))
-        )
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    fødselsdato = Foedsel(LocalDate.now().minusYears(17).toString())
+                )
+            )
+        }
 
         val personOppslagRespons = tilgangService.hentPerson(jwtToken)
 

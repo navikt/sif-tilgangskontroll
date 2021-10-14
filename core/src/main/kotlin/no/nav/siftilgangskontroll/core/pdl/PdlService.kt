@@ -22,7 +22,7 @@ class PdlService(
         private val objectMapper = jacksonObjectMapper()
     }
 
-    suspend fun person(ident: String, borgerToken: String): Person {
+   internal suspend fun person(ident: String, borgerToken: String): Person {
         val result = when(graphQLClient) {
             is GraphQLWebClient -> graphQLClient.execute(HentPerson(HentPerson.Variables(ident))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
@@ -46,7 +46,7 @@ class PdlService(
         }
     }
 
-    suspend fun barn(identer: List<ID>, systemToken: String): List<no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person> {
+    internal suspend fun barn(identer: List<ID>, systemToken: String): List<no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person> {
         val result = when(graphQLClient) {
             is GraphQLWebClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
