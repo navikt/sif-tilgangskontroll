@@ -58,7 +58,7 @@ internal data class BarnContext(
 }
 
 /**
- * Feltet adressebeskyttelse er ugradert nårt den er tom.
+ * Feltet adressebeskyttelse er ugradert når den er tom.
  * Ellers vil den kunne inneholde en eller flere av disse verdiene: FORTROLIG STRENGT_FORTROLIG STRENGT_FORTROLIG_UTLAND.
  */
 fun Person.harAdresseSkjerming(): Boolean = adressebeskyttelse.isNotEmpty()
