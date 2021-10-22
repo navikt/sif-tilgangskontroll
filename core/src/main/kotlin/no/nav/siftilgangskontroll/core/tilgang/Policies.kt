@@ -22,10 +22,10 @@ object Policies {
             id = "SIF.1"
             description = "NAV-Bruker skal ikke ha tilgang til barn med adressebeskyttelse"
             evaluation = {
-                val barnHarStrengtFortroligAdresse: Boolean = pdlBarn.harStrengtFortroligAdresse(barnIdent)
+                val harAdresseSkjerming: Boolean = pdlBarn.harAdresseSkjerming(barnIdent)
 
                 when {
-                   barnHarStrengtFortroligAdresse -> deny("NAV-bruker har ikke tilgang til barn med adressebeskyttelse")
+                   harAdresseSkjerming -> deny("NAV-bruker har ikke tilgang til barn med adressebeskyttelse")
                     else -> permit("NAV-bruker har tilgang til barn")
                 }
             }
