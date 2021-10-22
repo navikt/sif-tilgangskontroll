@@ -1,9 +1,9 @@
 query($ident: ID!){
     hentPerson(ident: $ident) {
-        folkeregisteridentifikator(historikk: false){
+        folkeregisteridentifikator {
             identifikasjonsnummer
         }
-        navn(historikk: false) {
+        navn {
             fornavn
             mellomnavn
             etternavn
