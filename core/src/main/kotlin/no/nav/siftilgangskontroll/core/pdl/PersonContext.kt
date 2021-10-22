@@ -3,8 +3,6 @@ package no.nav.siftilgangskontroll.core.pdl
 import kotlinx.coroutines.runBlocking
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.core.utils.personIdent
-import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
-import no.nav.siftilgangskontroll.pdl.generated.hentperson.Adressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.ForelderBarnRelasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import java.time.LocalDate
@@ -28,21 +26,17 @@ data class PdlPerson(
 ) {
     val person = runBlocking { pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken) }
 
-    fun harStrengtFortroligAdresse(): Boolean = person.harStrengtFortroligAdresse()
     fun erDød(): Boolean = person.erDød()
     fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon
     fun fødselsdato(): LocalDate = LocalDate.parse(person.foedsel.first().foedselsdato!!)
     fun erMyndig(): Boolean {
         val alder = Period.between(fødselsdato(), LocalDate.now()).years
-            return when {
-                alder >= MYNDIG_ALDER -> true
-                else -> false
-            }
+        return when {
+            alder >= MYNDIG_ALDER -> true
+            else -> false
+        }
     }
 }
-
-fun Person.harStrengtFortroligAdresse(): Boolean = adressebeskyttelse
-    .contains(Adressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG))
 
 fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
 fun Person.ident() = folkeregisteridentifikator.first().identifikasjonsnummer
