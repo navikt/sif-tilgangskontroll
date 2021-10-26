@@ -10,17 +10,7 @@ import java.time.Period
 
 const val MYNDIG_ALDER = 18
 
-internal data class HentPersonContext(
-    private val bearerToken: JwtToken,
-    private val pdlService: PdlService
-) {
-    val pdlPerson = PdlPerson(
-        borgerToken = bearerToken.tokenAsString,
-        pdlService = pdlService
-    )
-}
-
-data class PdlPerson(
+data class PdlPersonContext(
     private val pdlService: PdlService,
     val borgerToken: String
 ) {
@@ -31,10 +21,8 @@ data class PdlPerson(
     fun fødselsdato(): LocalDate = LocalDate.parse(person.foedsel.first().foedselsdato!!)
     fun erMyndig(): Boolean {
         val alder = Period.between(fødselsdato(), LocalDate.now()).years
-        return when {
-            alder >= MYNDIG_ALDER -> true
-            else -> false
-        }
+
+        return alder >= MYNDIG_ALDER
     }
 }
 
