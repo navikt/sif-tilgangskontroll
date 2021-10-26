@@ -8,7 +8,7 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er under myndighetsalder`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
-import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang barn`
+import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang til barn`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import org.slf4j.LoggerFactory
@@ -57,7 +57,7 @@ class TilgangService(
                 ctx = barnContext,
                 policy = `Barn er i live`(barn.ident())
                         and `Barn er under myndighetsalder`(barn.ident())
-                        and `NAV-bruker har tilgang barn`(barn.ident())
+                        and `NAV-bruker har tilgang til barn`(barn.ident())
                         and `Barn er ikke adressebeskyttet`(
                     barn.ident()
                 ),

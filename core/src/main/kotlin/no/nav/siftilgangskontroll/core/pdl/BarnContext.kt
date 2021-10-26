@@ -31,10 +31,7 @@ data class PdlBarn(
 
     fun erMyndig(ident: BarnIdent): Boolean {
         val alder = Period.between(fødselsdato(ident), LocalDate.now()).years
-        return when {
-            alder >= MYNDIG_ALDER -> true
-            else -> false
-        }
+        return alder >= MYNDIG_ALDER
     }
 }
 

@@ -21,10 +21,8 @@ data class PdlPersonContext(
     fun fødselsdato(): LocalDate = LocalDate.parse(person.foedsel.first().foedselsdato!!)
     fun erMyndig(): Boolean {
         val alder = Period.between(fødselsdato(), LocalDate.now()).years
-        return when {
-            alder >= MYNDIG_ALDER -> true
-            else -> false
-        }
+
+        return alder >= MYNDIG_ALDER
     }
 }
 

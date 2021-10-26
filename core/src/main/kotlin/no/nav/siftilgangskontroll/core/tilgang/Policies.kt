@@ -43,7 +43,7 @@ object Policies {
         }
 
     // TODO: 23/09/2021 Mulig med fullmakt kanskje?
-    internal fun `NAV-bruker har tilgang barn`(barnIdent: BarnIdent): Policy<BarnContext> =
+    internal fun `NAV-bruker har tilgang til barn`(barnIdent: BarnIdent): Policy<BarnContext> =
         policy {
             id = "SIF.3"
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
