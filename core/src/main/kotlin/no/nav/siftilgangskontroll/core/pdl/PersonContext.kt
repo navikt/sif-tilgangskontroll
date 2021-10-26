@@ -10,17 +10,7 @@ import java.time.Period
 
 const val MYNDIG_ALDER = 18
 
-internal data class HentPersonContext(
-    private val bearerToken: JwtToken,
-    private val pdlService: PdlService
-) {
-    val pdlPerson = PdlPerson(
-        borgerToken = bearerToken.tokenAsString,
-        pdlService = pdlService
-    )
-}
-
-data class PdlPerson(
+data class PdlPersonContext(
     private val pdlService: PdlService,
     val borgerToken: String
 ) {

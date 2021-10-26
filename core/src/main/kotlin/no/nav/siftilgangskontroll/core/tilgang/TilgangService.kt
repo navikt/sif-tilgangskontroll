@@ -1,10 +1,8 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
+import no.nav.siftilgangskontroll.core.pdl.*
 import no.nav.siftilgangskontroll.core.pdl.BarnContext
-import no.nav.siftilgangskontroll.core.pdl.HentPersonContext
-import no.nav.siftilgangskontroll.core.pdl.PdlService
-import no.nav.siftilgangskontroll.core.pdl.ident
 import no.nav.siftilgangskontroll.policy.spesification.evaluate
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er under myndighetsalder`
@@ -85,14 +83,14 @@ class TilgangService(
      * @return TilgangResponsePerson: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
     fun hentPerson(bearerToken: String): TilgangResponsePerson {
-        val personContext = HentPersonContext(bearerToken =JwtToken(bearerToken), pdlService = pdlService)
+        val personContext = PdlPersonContext(borgerToken = bearerToken, pdlService = pdlService)
         return evaluate(
             ctx = personContext,
             policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
             block = {
                 when(it.decision) {
-                    PolicyDecision.PERMIT -> TilgangResponsePerson(personContext.pdlPerson.person.ident(), personContext.pdlPerson.person, it)
-                    else -> TilgangResponsePerson(personContext.pdlPerson.person.ident(), null, it)
+                    PolicyDecision.PERMIT -> TilgangResponsePerson(personContext.person.ident(), personContext.person, it)
+                    else -> TilgangResponsePerson(personContext.person.ident(), null, it)
                 }
             })
     }

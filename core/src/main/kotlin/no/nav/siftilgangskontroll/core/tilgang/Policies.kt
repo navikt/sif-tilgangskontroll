@@ -1,9 +1,7 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
+import no.nav.siftilgangskontroll.core.pdl.*
 import no.nav.siftilgangskontroll.core.pdl.BarnContext
-import no.nav.siftilgangskontroll.core.pdl.BarnIdent
-import no.nav.siftilgangskontroll.core.pdl.HentPersonContext
-import no.nav.siftilgangskontroll.core.pdl.MYNDIG_ALDER
 import no.nav.siftilgangskontroll.policy.spesification.Policy
 import no.nav.siftilgangskontroll.policy.spesification.Policy.Companion.policy
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation.Companion.deny
@@ -51,7 +49,7 @@ object Policies {
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
             evaluation = {
 
-                val erKjentRelasjon = pdlPerson.relasjoner().map { it.relatertPersonsIdent }.contains(barnIdent)
+                val erKjentRelasjon = pdlPersonContext.relasjoner().map { it.relatertPersonsIdent }.contains(barnIdent)
 
                 when {
                     erKjentRelasjon -> permit("Relasjon er kjent")
@@ -72,24 +70,24 @@ object Policies {
             }
         }
 
-    internal fun `NAV-bruker er i live`(): Policy<HentPersonContext> =
+    internal fun `NAV-bruker er i live`(): Policy<PdlPersonContext> =
         policy {
             id = "FP.10"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som ikke er i live."
             evaluation = {
-                when (pdlPerson.erDød()) {
+                when (erDød()) {
                     true -> deny("NAV-bruker er ikke lenger i live")
                     else -> permit("NAV-bruker er i live")
                 }
             }
         }
 
-    internal fun `NAV-bruker er myndig`(): Policy<HentPersonContext> =
+    internal fun `NAV-bruker er myndig`(): Policy<PdlPersonContext> =
         policy {
             id = "FP.11"
             description = "Tilgang til selvbetjening skal nektes til NAV-brukere som er mindreårig (under $MYNDIG_ALDER år)."
             evaluation = {
-                when (pdlPerson.erMyndig()) {
+                when (erMyndig()) {
                     true ->  permit("NAV-bruker er myndig")
                     else -> deny("NAV-bruker er ikke myndig")
                 }

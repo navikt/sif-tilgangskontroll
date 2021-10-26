@@ -44,7 +44,7 @@ internal data class BarnContext(
     private val bearerToken: JwtToken,
     private val systemtoken: JwtToken
 ) {
-    val pdlPerson = PdlPerson(
+    val pdlPersonContext = PdlPersonContext(
         borgerToken = bearerToken.tokenAsString,
         pdlService = pdlService
 
