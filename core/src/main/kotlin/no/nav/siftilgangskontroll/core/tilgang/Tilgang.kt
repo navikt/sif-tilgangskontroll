@@ -11,18 +11,18 @@ data class BarnTilgangForespørsel(
 
 data class TilgangResponsePerson(
     val ident: String,
-    val data: Person? = null,
+    val person: Person? = null,
     val policyEvaluation: PolicyEvaluation
 )
 
 data class TilgangResponseBarn(
     val ident: String,
-    val data: no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person? = null,
+    val barn: no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person? = null,
     val policyEvaluation: PolicyEvaluation
 )
 
 data class TilgangResponseAktørId(
     val ident: String,
-    val data: AktørId? = null,
+    val aktørId: AktørId? = null,
     val policyEvaluation: PolicyEvaluation
 )

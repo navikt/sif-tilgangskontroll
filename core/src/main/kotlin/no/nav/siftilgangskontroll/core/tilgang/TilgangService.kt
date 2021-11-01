@@ -110,7 +110,7 @@ class TilgangService(
                 when (it.decision) {
                     PolicyDecision.PERMIT -> TilgangResponseAktørId(
                         ident = pdlAktørIdContext.pdlPersonContext.person.ident(),
-                        data = pdlAktørIdContext.identer.tilAktørId(),
+                        aktørId = pdlAktørIdContext.identer.tilAktørId(),
                         policyEvaluation = it
                     )
 
