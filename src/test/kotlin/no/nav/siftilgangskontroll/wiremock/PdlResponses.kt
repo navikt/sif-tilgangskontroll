@@ -1,7 +1,9 @@
 package no.nav.siftilgangskontroll.wiremock
 
 import no.nav.siftilgangskontroll.pdl.generated.enums.ForelderBarnRelasjonRolle
+import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
+import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Doedsfall as BarnDoedsfall
@@ -57,5 +59,9 @@ object PdlResponses {
             doedsfall = dødsdato?.let { listOf(it) } ?: listOf(),
             adressebeskyttelse = adressebeskyttelse?.let { listOf(it) } ?: listOf()
         )
+    )
+
+    fun defaultHentIdenterResult(ident: String, identGruppe: IdentGruppe) = listOf(
+        IdentInformasjon(ident = ident, historisk = false, gruppe = identGruppe)
     )
 }

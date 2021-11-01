@@ -7,15 +7,18 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.siftilgangskontroll.core.pdl.utils.PdlOperasjon
+import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentIdenterResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonBolkResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonResponse
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
 import no.nav.siftilgangskontroll.core.tilgang.TilgangService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering.STRENGT_FORTROLIG
+import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
 import no.nav.siftilgangskontroll.utils.hentToken
+import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentIdenterResult
 import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentPersonBolkResult
 import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentPersonResult
 import no.nav.siftilgangskontroll.wiremock.stubPdlRequest
@@ -252,6 +255,63 @@ class TilgangServiceTest {
             listOf(
                 PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.DENY)
+            )
+        )
+    }
+
+    @Test
+    fun `gitt NAV-bruker er under myndighetsalder (18), forvent nektet tilgang ved henting av aktørId`() {
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    fødselsdato = Foedsel(LocalDate.now().minusYears(17).toString())
+                )
+            )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER) {
+            pdlHentIdenterResponse(
+                identer = defaultHentIdenterResult("123456", IdentGruppe.AKTORID)
+            )
+        }
+
+        val aktørIdTilgangResponse = tilgangService.hentAktørId(jwtToken)
+
+        assertThat(aktørIdTilgangResponse).isNotNull()
+        assertThat(aktørIdTilgangResponse.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(aktørIdTilgangResponse.policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.DENY)
+            )
+        )
+    }
+
+    @Test
+    fun `gitt NAV-bruker ikke lenger er i live, forvent nektet tilgang ved henting av aktørId`() {
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    dødsdato = Doedsfall(LocalDate.now().toString())
+                )
+            )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER) {
+            pdlHentIdenterResponse(
+                identer = defaultHentIdenterResult("123456", IdentGruppe.AKTORID)
+            )
+        }
+
+        val aktørIdTilgangResponse = tilgangService.hentAktørId(jwtToken)
+
+        assertThat(aktørIdTilgangResponse).isNotNull()
+        assertThat(aktørIdTilgangResponse.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(aktørIdTilgangResponse.policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.DENY),
+                PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.PERMIT)
             )
         )
     }

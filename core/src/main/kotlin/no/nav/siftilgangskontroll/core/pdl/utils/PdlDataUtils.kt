@@ -2,6 +2,7 @@ package no.nav.siftilgangskontroll.core.pdl.utils
 
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
+import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -19,6 +20,8 @@ fun List<Navn>.navnSomJsonArray() = JSONArray(
         ))
     }
 )
+
+fun List<IdentInformasjon>.identerSomJsonArray() = JSONArray(this)
 
 fun List<AdressebeskyttelseGradering>.adressebeskyttelseGraderingJsonArray() = JSONArray(
     map {

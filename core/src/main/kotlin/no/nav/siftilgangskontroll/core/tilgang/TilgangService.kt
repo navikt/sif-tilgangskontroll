@@ -12,6 +12,7 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang 
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import org.slf4j.LoggerFactory
+import java.util.*
 
 /**
  * Denne klassens ansvar er å hente oppslagsdata, håndhevet gjennom et sett med policier.
@@ -42,14 +43,16 @@ class TilgangService(
     fun hentBarn(
         barnTilgangForespørsel: BarnTilgangForespørsel,
         bearerToken: String,
-        systemToken: String
+        systemToken: String,
+        callId: String = UUID.randomUUID().toString()
     ): List<TilgangResponseBarn> {
 
         val barnContext = BarnContext(
             barnTilgangForespørsel = barnTilgangForespørsel,
             pdlService = pdlService,
             bearerToken = JwtToken(bearerToken),
-            systemtoken = JwtToken(systemToken)
+            systemtoken = JwtToken(systemToken),
+            callId = callId
         )
 
         return barnContext.pdlBarn.barn.map { barn ->
@@ -62,7 +65,7 @@ class TilgangService(
                     barn.ident()
                 ),
                 block = {
-                    when(it.decision) {
+                    when (it.decision) {
                         PolicyDecision.PERMIT -> TilgangResponseBarn(barn.ident(), barn, it)
                         else -> TilgangResponseBarn(barn.ident(), null, it)
                     }
@@ -82,17 +85,50 @@ class TilgangService(
      *
      * @return TilgangResponsePerson: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
-    fun hentPerson(bearerToken: String): TilgangResponsePerson {
-        val personContext = PdlPersonContext(borgerToken = bearerToken, pdlService = pdlService)
+    fun hentPerson(bearerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponsePerson {
+        val personContext = PdlPersonContext(
+            pdlService = pdlService,
+            borgerToken = bearerToken,
+            callId = callId
+        )
         return evaluate(
             ctx = personContext,
             policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
             block = {
-                when(it.decision) {
-                    PolicyDecision.PERMIT -> TilgangResponsePerson(personContext.person.ident(), personContext.person, it)
+                when (it.decision) {
+                    PolicyDecision.PERMIT -> TilgangResponsePerson(
+                        personContext.person.ident(),
+                        personContext.person,
+                        it
+                    )
                     else -> TilgangResponsePerson(personContext.person.ident(), null, it)
                 }
             })
+    }
+
+    fun hentAktørId(borgerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponseAktørId {
+        val pdlAktørIdContext = PdlAktørIdContext(
+            pdlService = pdlService,
+            borgerToken = borgerToken,
+            callId = callId
+        )
+
+        return evaluate(
+            ctx = pdlAktørIdContext.pdlPersonContext,
+            policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
+            block = {
+
+                when (it.decision) {
+                    PolicyDecision.PERMIT -> TilgangResponseAktørId(
+                        ident = pdlAktørIdContext.pdlPersonContext.person.ident(),
+                        aktørId = pdlAktørIdContext.identer.tilAktørId(),
+                        policyEvaluation = it
+                    )
+
+                    else -> TilgangResponseAktørId(pdlAktørIdContext.pdlPersonContext.person.ident(), null, it)
+                }
+            }
+        )
     }
 }
 
