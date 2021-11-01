@@ -54,7 +54,7 @@ class TilgangsController(
         return barnOppslagRespons.somResponseEntity()
     }
 
-    @GetMapping(AKTØR_ID, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(AKTØR_ID, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
     fun hentTilgangTilAktørId(@RequestBody aktørIdTilgangForespørsel: AktørIdTilgangForespørsel): ResponseEntity<TilgangResponseAktørId> {
