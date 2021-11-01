@@ -1,7 +1,7 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
 import no.nav.siftilgangskontroll.core.pdl.BarnIdent
-import no.nav.siftilgangskontroll.core.pdl.Ident
+import no.nav.siftilgangskontroll.core.pdl.AktørId
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
 
@@ -23,6 +23,6 @@ data class TilgangResponseBarn(
 
 data class TilgangResponseAktørId(
     val ident: String,
-    val data: Ident? = null,
+    val data: AktørId? = null,
     val policyEvaluation: PolicyEvaluation
 )

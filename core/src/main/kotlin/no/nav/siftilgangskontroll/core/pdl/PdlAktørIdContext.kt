@@ -13,6 +13,6 @@ data class PdlAktørIdContext(
     val pdlPersonContext = PdlPersonContext(pdlService, borgerToken)
 }
 
-fun List<IdentInformasjon>.tilAktørId(): Ident = Ident(first().ident)
+fun List<IdentInformasjon>.tilAktørId(): AktørId = AktørId(first().ident)
 
-data class Ident(internal val value: String)
+data class AktørId(internal val value: String)
