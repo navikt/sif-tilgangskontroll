@@ -276,7 +276,7 @@ class TilgangServiceTest {
             )
         }
 
-        val aktørIdTilgangResponse = tilgangService.hentAktørId(jwtToken)
+        val aktørIdTilgangResponse = tilgangService.hentAktørId("123", jwtToken)
 
         assertThat(aktørIdTilgangResponse).isNotNull()
         assertThat(aktørIdTilgangResponse.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -304,7 +304,7 @@ class TilgangServiceTest {
             )
         }
 
-        val aktørIdTilgangResponse = tilgangService.hentAktørId(jwtToken)
+        val aktørIdTilgangResponse = tilgangService.hentAktørId("123", jwtToken)
 
         assertThat(aktørIdTilgangResponse).isNotNull()
         assertThat(aktørIdTilgangResponse.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)

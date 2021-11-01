@@ -54,12 +54,13 @@ class TilgangsController(
         return barnOppslagRespons.somResponseEntity()
     }
 
-    @GetMapping(AKTØR_ID, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping(AKTØR_ID, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentTilgangTilAktørId(): ResponseEntity<TilgangResponseAktørId> {
+    fun hentTilgangTilAktørId(@RequestBody aktørIdTilgangForespørsel: AktørIdTilgangForespørsel): ResponseEntity<TilgangResponseAktørId> {
         val tilgangResponseAktørId =
             tilgangService.hentAktørId(
+                ident = aktørIdTilgangForespørsel.ident,
                 borgerToken = pdlAuthService.borgerToken(),
                 callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
             )

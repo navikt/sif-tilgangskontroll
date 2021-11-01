@@ -8,6 +8,9 @@ import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
 data class BarnTilgangForespørsel(
     val barnIdenter: List<BarnIdent>
 )
+data class AktørIdTilgangForespørsel(
+    val ident: String
+)
 
 data class TilgangResponsePerson(
     val ident: String,
