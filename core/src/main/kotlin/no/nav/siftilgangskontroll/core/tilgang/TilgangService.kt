@@ -12,6 +12,7 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang 
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import org.slf4j.LoggerFactory
+import java.util.*
 
 /**
  * Denne klassens ansvar er å hente oppslagsdata, håndhevet gjennom et sett med policier.
@@ -42,14 +43,16 @@ class TilgangService(
     fun hentBarn(
         barnTilgangForespørsel: BarnTilgangForespørsel,
         bearerToken: String,
-        systemToken: String
+        systemToken: String,
+        callId: String = UUID.randomUUID().toString()
     ): List<TilgangResponseBarn> {
 
         val barnContext = BarnContext(
             barnTilgangForespørsel = barnTilgangForespørsel,
             pdlService = pdlService,
             bearerToken = JwtToken(bearerToken),
-            systemtoken = JwtToken(systemToken)
+            systemtoken = JwtToken(systemToken),
+            callId = callId
         )
 
         return barnContext.pdlBarn.barn.map { barn ->
@@ -82,8 +85,12 @@ class TilgangService(
      *
      * @return TilgangResponsePerson: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
-    fun hentPerson(bearerToken: String): TilgangResponsePerson {
-        val personContext = PdlPersonContext(borgerToken = bearerToken, pdlService = pdlService)
+    fun hentPerson(bearerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponsePerson {
+        val personContext = PdlPersonContext(
+            pdlService = pdlService,
+            borgerToken = bearerToken,
+            callId = callId
+        )
         return evaluate(
             ctx = personContext,
             policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
@@ -99,8 +106,12 @@ class TilgangService(
             })
     }
 
-    fun hentAktørId(borgerToken: String): TilgangResponseAktørId {
-        val pdlAktørIdContext = PdlAktørIdContext(pdlService, borgerToken)
+    fun hentAktørId(borgerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponseAktørId {
+        val pdlAktørIdContext = PdlAktørIdContext(
+            pdlService = pdlService,
+            borgerToken = borgerToken,
+            callId = callId
+        )
 
         return evaluate(
             ctx = pdlAktørIdContext.pdlPersonContext,

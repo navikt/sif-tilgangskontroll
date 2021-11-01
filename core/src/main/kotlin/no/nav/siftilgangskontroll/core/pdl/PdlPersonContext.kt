@@ -12,9 +12,10 @@ const val MYNDIG_ALDER = 18
 
 data class PdlPersonContext(
     private val pdlService: PdlService,
-    val borgerToken: String
+    val borgerToken: String,
+    val callId: String
 ) {
-    val person = runBlocking { pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken) }
+    val person = runBlocking { pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken, callId) }
 
     fun erDød(): Boolean = person.erDød()
     fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon

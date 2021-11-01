@@ -12,10 +12,11 @@ typealias BarnIdent = String
 
 data class PdlBarn(
     private val pdlService: PdlService,
+    private val callId: String,
     val barnIdent: List<ID>,
     val systemToken: String
 ) {
-    val barn = runBlocking { pdlService.barn(barnIdent, systemToken) }
+    val barn = runBlocking { pdlService.barn(barnIdent, systemToken, callId) }
 
     fun harAdresseSkjerming(ident: BarnIdent): Boolean = barn
         .filtererPåIdent(ident)
@@ -38,18 +39,20 @@ data class PdlBarn(
 internal data class BarnContext(
     val barnTilgangForespørsel: BarnTilgangForespørsel,
     val pdlService: PdlService,
+    private val callId: String,
     private val bearerToken: JwtToken,
     private val systemtoken: JwtToken
 ) {
     val pdlPersonContext = PdlPersonContext(
+        pdlService = pdlService,
         borgerToken = bearerToken.tokenAsString,
-        pdlService = pdlService
-
+        callId = callId
     )
 
     val pdlBarn = PdlBarn(
         pdlService = pdlService,
         barnIdent = barnTilgangForespørsel.barnIdenter,
+        callId = callId,
         systemToken = systemtoken.tokenAsString
     )
 }

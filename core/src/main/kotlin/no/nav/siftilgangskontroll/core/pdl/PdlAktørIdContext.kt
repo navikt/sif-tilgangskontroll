@@ -7,10 +7,11 @@ import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 
 data class PdlAktørIdContext(
     private val pdlService: PdlService,
+    private val callId: String,
     val borgerToken: String
 ) {
-    val identer: List<IdentInformasjon> = runBlocking { pdlService.aktørId(JwtToken(borgerToken).personIdent(), borgerToken) }
-    val pdlPersonContext = PdlPersonContext(pdlService, borgerToken)
+    val identer: List<IdentInformasjon> = runBlocking { pdlService.aktørId(JwtToken(borgerToken).personIdent(), borgerToken, callId) }
+    val pdlPersonContext = PdlPersonContext(pdlService, borgerToken, callId)
 }
 
 fun List<IdentInformasjon>.tilAktørId(): AktørId = AktørId(first().ident)

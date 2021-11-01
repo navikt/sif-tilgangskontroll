@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping(TILGANG)
@@ -31,7 +32,7 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<TilgangResponsePerson> {
         val personOppslagRespons =
-            tilgangService.hentPerson(pdlAuthService.borgerToken())
+            tilgangService.hentPerson(bearerToken = pdlAuthService.borgerToken(), callId = "sif-tilgangskontroll-${UUID.randomUUID()}")
         logger.info("Hentet tilgang: {}", personOppslagRespons)
 
         return personOppslagRespons.somResponseEntity()
@@ -42,7 +43,12 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<TilgangResponseBarn>> {
         val barnOppslagRespons =
-            tilgangService.hentBarn(barnTilgangForespørsel, pdlAuthService.borgerToken(), pdlAuthService.systemToken())
+            tilgangService.hentBarn(
+                barnTilgangForespørsel = barnTilgangForespørsel,
+                bearerToken = pdlAuthService.borgerToken(),
+                systemToken = pdlAuthService.systemToken(),
+                callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+            )
         logger.info("Hentet tilgang: {}", barnOppslagRespons)
 
         return barnOppslagRespons.somResponseEntity()
@@ -53,7 +59,10 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilAktørId(): ResponseEntity<TilgangResponseAktørId> {
         val tilgangResponseAktørId =
-            tilgangService.hentAktørId(pdlAuthService.borgerToken())
+            tilgangService.hentAktørId(
+                borgerToken = pdlAuthService.borgerToken(),
+                callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+            )
         logger.info("Hentet tilgang: {}", tilgangResponseAktørId)
 
         return tilgangResponseAktørId.somResponseEntity()
