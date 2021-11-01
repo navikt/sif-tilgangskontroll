@@ -9,6 +9,7 @@ import no.nav.siftilgangskontroll.pdl.generated.HentBarn
 import no.nav.siftilgangskontroll.pdl.generated.HentIdent
 import no.nav.siftilgangskontroll.pdl.generated.HentPerson
 import no.nav.siftilgangskontroll.pdl.generated.ID
+import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import org.slf4j.LoggerFactory
@@ -79,11 +80,11 @@ class PdlService(
 
     internal suspend fun aktørId(ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString()): List<IdentInformasjon> {
         val result = when(graphQLClient) {
-            is GraphQLWebClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident))) {
+            is GraphQLWebClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(IdentGruppe.AKTORID)))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
                 header(NAV_CALL_ID, callId)
             }
-            is GraphQLKtorClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident))) {
+            is GraphQLKtorClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(IdentGruppe.AKTORID)))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
                 header(NAV_CALL_ID, callId)
             }
