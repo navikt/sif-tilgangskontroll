@@ -62,7 +62,7 @@ class TilgangService(
                     barn.ident()
                 ),
                 block = {
-                    when(it.decision) {
+                    when (it.decision) {
                         PolicyDecision.PERMIT -> TilgangResponseBarn(barn.ident(), barn, it)
                         else -> TilgangResponseBarn(barn.ident(), null, it)
                     }
@@ -88,11 +88,36 @@ class TilgangService(
             ctx = personContext,
             policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
             block = {
-                when(it.decision) {
-                    PolicyDecision.PERMIT -> TilgangResponsePerson(personContext.person.ident(), personContext.person, it)
+                when (it.decision) {
+                    PolicyDecision.PERMIT -> TilgangResponsePerson(
+                        personContext.person.ident(),
+                        personContext.person,
+                        it
+                    )
                     else -> TilgangResponsePerson(personContext.person.ident(), null, it)
                 }
             })
+    }
+
+    fun hentAktørId(borgerToken: String): TilgangResponseAktørId {
+        val pdlAktørIdContext = PdlAktørIdContext(pdlService, borgerToken)
+
+        return evaluate(
+            ctx = pdlAktørIdContext.pdlPersonContext,
+            policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
+            block = {
+
+                when (it.decision) {
+                    PolicyDecision.PERMIT -> TilgangResponseAktørId(
+                        ident = pdlAktørIdContext.pdlPersonContext.person.ident(),
+                        data = pdlAktørIdContext.identer.tilAktørId(),
+                        policyEvaluation = it
+                    )
+
+                    else -> TilgangResponseAktørId(pdlAktørIdContext.pdlPersonContext.person.ident(), null, it)
+                }
+            }
+        )
     }
 }
 

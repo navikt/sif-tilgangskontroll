@@ -6,8 +6,10 @@ import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.request.*
 import no.nav.siftilgangskontroll.pdl.generated.HentBarn
+import no.nav.siftilgangskontroll.pdl.generated.HentIdent
 import no.nav.siftilgangskontroll.pdl.generated.HentPerson
 import no.nav.siftilgangskontroll.pdl.generated.ID
+import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -66,6 +68,30 @@ class PdlService(
             result.data!!.hentPersonBolk.isNotEmpty() -> result.data!!.hentPersonBolk.map { it.person!! }
             else -> {
                 throw IllegalStateException("Feil ved henting av person-bolk.")
+            }
+        }
+    }
+
+    internal suspend fun aktørId(ident: String, borgerToken: String): List<IdentInformasjon> {
+        val result = when(graphQLClient) {
+            is GraphQLWebClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident))) {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
+            }
+            is GraphQLKtorClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident))) {
+                header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
+            }
+            else -> throw Exception("Instance of GraphQLClient is not supported")
+        }
+
+        return when {
+            !result.errors.isNullOrEmpty() -> {
+                val errorSomJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result.errors)
+                logger.error("Feil ved henting av ident. Årsak: {}", errorSomJson)
+                throw IllegalStateException("Feil ved henting av ident.")
+            }
+            !result.data!!.hentIdenter!!.identer.isNullOrEmpty() -> result.data!!.hentIdenter!!.identer
+            else -> {
+                throw IllegalStateException("Feil ved henting av ident.")
             }
         }
     }

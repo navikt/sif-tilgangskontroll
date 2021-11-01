@@ -2,14 +2,12 @@ package no.nav.siftilgangskontroll.tilgang
 
 import no.nav.security.token.support.core.api.Protected
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.siftilgangskontroll.Routes.AKTØR_ID
 import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
+import no.nav.siftilgangskontroll.core.tilgang.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
-import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
-import no.nav.siftilgangskontroll.core.tilgang.TilgangResponseBarn
-import no.nav.siftilgangskontroll.core.tilgang.TilgangService
-import no.nav.siftilgangskontroll.core.tilgang.TilgangResponsePerson
 import no.nav.siftilgangskontroll.pdl.PdlAuthService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*
@@ -49,9 +47,26 @@ class TilgangsController(
 
         return barnOppslagRespons.somResponseEntity()
     }
+
+    @PostMapping(AKTØR_ID, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Protected
+    @ResponseStatus(OK)
+    fun hentTilgangTilAktørId(): ResponseEntity<TilgangResponseAktørId> {
+        val tilgangResponseAktørId =
+            tilgangService.hentAktørId(pdlAuthService.borgerToken())
+        logger.info("Hentet tilgang: {}", tilgangResponseAktørId)
+
+        return tilgangResponseAktørId.somResponseEntity()
+    }
 }
 
-fun TilgangResponsePerson.somResponseEntity() = when(policyEvaluation.decision) {
+private fun TilgangResponseAktørId.somResponseEntity() = when (policyEvaluation.decision) {
+    PolicyDecision.PERMIT -> ResponseEntity(this, OK)
+    PolicyDecision.DENY -> ResponseEntity(this, FORBIDDEN)
+    PolicyDecision.NOT_APPLICABLE -> ResponseEntity(INTERNAL_SERVER_ERROR)
+}
+
+fun TilgangResponsePerson.somResponseEntity() = when (policyEvaluation.decision) {
     PolicyDecision.PERMIT -> ResponseEntity(this, OK)
     PolicyDecision.DENY -> ResponseEntity(this, FORBIDDEN)
     PolicyDecision.NOT_APPLICABLE -> ResponseEntity(INTERNAL_SERVER_ERROR)
