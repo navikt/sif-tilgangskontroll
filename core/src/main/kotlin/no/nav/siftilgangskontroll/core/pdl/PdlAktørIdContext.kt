@@ -16,4 +16,4 @@ data class PdlAktørIdContext(
 
 fun List<IdentInformasjon>.tilAktørId(): AktørId = AktørId(first().ident)
 
-data class AktørId(internal val value: String)
+data class AktørId(val value: String)
