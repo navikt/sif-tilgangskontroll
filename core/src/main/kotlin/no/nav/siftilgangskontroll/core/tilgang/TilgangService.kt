@@ -106,9 +106,10 @@ class TilgangService(
             })
     }
 
-    fun hentAktørId(borgerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponseAktørId {
+    fun hentAktørId(ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponseAktørId {
         val pdlAktørIdContext = PdlAktørIdContext(
             pdlService = pdlService,
+            ident = ident,
             borgerToken = borgerToken,
             callId = callId
         )
