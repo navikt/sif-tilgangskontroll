@@ -12,7 +12,6 @@ data class PdlAktørIdContext(
     val borgerToken: String
 ) {
     val identer: List<IdentInformasjon> = runBlocking { pdlService.aktørId(ident, borgerToken, callId) }
-    val pdlPersonContext = PdlPersonContext(pdlService, borgerToken, callId)
 }
 
 fun List<IdentInformasjon>.tilAktørId(): AktørId = AktørId(first().ident)

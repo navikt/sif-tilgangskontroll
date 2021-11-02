@@ -106,30 +106,13 @@ class TilgangService(
             })
     }
 
-    fun hentAktørId(ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponseAktørId {
-        val pdlAktørIdContext = PdlAktørIdContext(
+    fun hentAktørId(ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString()): AktørId {
+        return PdlAktørIdContext(
             pdlService = pdlService,
             ident = ident,
             borgerToken = borgerToken,
             callId = callId
-        )
-
-        return evaluate(
-            ctx = pdlAktørIdContext.pdlPersonContext,
-            policy = `NAV-bruker er i live`() and `NAV-bruker er myndig`(),
-            block = {
-
-                when (it.decision) {
-                    PolicyDecision.PERMIT -> TilgangResponseAktørId(
-                        ident = pdlAktørIdContext.pdlPersonContext.person.ident(),
-                        aktørId = pdlAktørIdContext.identer.tilAktørId(),
-                        policyEvaluation = it
-                    )
-
-                    else -> TilgangResponseAktørId(pdlAktørIdContext.pdlPersonContext.person.ident(), null, it)
-                }
-            }
-        )
+        ).identer.tilAktørId()
     }
 }
 

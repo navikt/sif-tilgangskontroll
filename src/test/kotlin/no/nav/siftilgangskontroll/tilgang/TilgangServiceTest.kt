@@ -260,60 +260,19 @@ class TilgangServiceTest {
     }
 
     @Test
-    fun `gitt NAV-bruker er under myndighetsalder (18), forvent nektet tilgang ved henting av aktørId`() {
+    fun `test aktørId`() {
 
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
-            pdlHentPersonResponse(
-                person = defaultHentPersonResult(
-                    fødselsdato = Foedsel(LocalDate.now().minusYears(17).toString())
-                )
-            )
-        }
-
+        val forventetAktørId = "123456"
         wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER) {
             pdlHentIdenterResponse(
-                identer = defaultHentIdenterResult("123456", IdentGruppe.AKTORID)
+                identer = defaultHentIdenterResult(forventetAktørId, IdentGruppe.AKTORID)
             )
         }
 
-        val aktørIdTilgangResponse = tilgangService.hentAktørId("123", jwtToken)
+        val aktørId = tilgangService.hentAktørId("123", jwtToken)
 
-        assertThat(aktørIdTilgangResponse).isNotNull()
-        assertThat(aktørIdTilgangResponse.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(aktørIdTilgangResponse.policyEvaluation.children.resultat()).isEqualTo(
-            listOf(
-                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
-                PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.DENY)
-            )
-        )
-    }
-
-    @Test
-    fun `gitt NAV-bruker ikke lenger er i live, forvent nektet tilgang ved henting av aktørId`() {
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
-            pdlHentPersonResponse(
-                person = defaultHentPersonResult(
-                    dødsdato = Doedsfall(LocalDate.now().toString())
-                )
-            )
-        }
-
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER) {
-            pdlHentIdenterResponse(
-                identer = defaultHentIdenterResult("123456", IdentGruppe.AKTORID)
-            )
-        }
-
-        val aktørIdTilgangResponse = tilgangService.hentAktørId("123", jwtToken)
-
-        assertThat(aktørIdTilgangResponse).isNotNull()
-        assertThat(aktørIdTilgangResponse.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(aktørIdTilgangResponse.policyEvaluation.children.resultat()).isEqualTo(
-            listOf(
-                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.DENY),
-                PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.PERMIT)
-            )
-        )
+        assertThat(aktørId).isNotNull()
+        assertThat(aktørId.value).isEqualTo(forventetAktørId)
     }
 }
 
