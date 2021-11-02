@@ -6,6 +6,7 @@ import no.nav.siftilgangskontroll.Routes.AKTØR_ID
 import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
+import no.nav.siftilgangskontroll.core.pdl.AktørId
 import no.nav.siftilgangskontroll.core.tilgang.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.pdl.PdlAuthService
@@ -32,7 +33,10 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<TilgangResponsePerson> {
         val personOppslagRespons =
-            tilgangService.hentPerson(bearerToken = pdlAuthService.borgerToken(), callId = "sif-tilgangskontroll-${UUID.randomUUID()}")
+            tilgangService.hentPerson(
+                bearerToken = pdlAuthService.borgerToken(),
+                callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+            )
         logger.info("Hentet tilgang: {}", personOppslagRespons)
 
         return personOppslagRespons.somResponseEntity()
@@ -57,24 +61,19 @@ class TilgangsController(
     @PostMapping(AKTØR_ID, produces = [MediaType.APPLICATION_JSON_VALUE])
     @Protected
     @ResponseStatus(OK)
-    fun hentTilgangTilAktørId(@RequestBody aktørIdTilgangForespørsel: AktørIdTilgangForespørsel): ResponseEntity<TilgangResponseAktørId> {
-        val tilgangResponseAktørId =
+    fun hentTilgangTilAktørId(@RequestBody aktørIdTilgangForespørsel: AktørIdTilgangForespørsel): AktørId {
+        val aktørId =
             tilgangService.hentAktørId(
                 ident = aktørIdTilgangForespørsel.ident,
                 borgerToken = pdlAuthService.borgerToken(),
                 callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
             )
-        logger.info("Hentet tilgang: {}", tilgangResponseAktørId)
+        logger.info("Hentet aktørId: {}", aktørId)
 
-        return tilgangResponseAktørId.somResponseEntity()
+        return aktørId
     }
 }
 
-private fun TilgangResponseAktørId.somResponseEntity() = when (policyEvaluation.decision) {
-    PolicyDecision.PERMIT -> ResponseEntity(this, OK)
-    PolicyDecision.DENY -> ResponseEntity(this, FORBIDDEN)
-    PolicyDecision.NOT_APPLICABLE -> ResponseEntity(INTERNAL_SERVER_ERROR)
-}
 
 fun TilgangResponsePerson.somResponseEntity() = when (policyEvaluation.decision) {
     PolicyDecision.PERMIT -> ResponseEntity(this, OK)
