@@ -1,7 +1,7 @@
 
 plugins {
     kotlin("jvm")
-    id("com.expediagroup.graphql")  version "5.1.1"
+    id("com.expediagroup.graphql")  version "5.3.0"
 }
 
 val tokenSupportVersion by extra("1.3.8")
