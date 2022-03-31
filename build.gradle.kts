@@ -2,21 +2,19 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
-    id("org.springframework.boot") version "2.5.5"
+    id("org.springframework.boot") version "2.6.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
-    kotlin("plugin.jpa") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.spring") version "1.6.10"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 val kotlinVersion by extra("1.5.31")
 val kotlinXVersion by extra("1.5.2")
-val springfoxVersion by extra("3.0.0")
 val logstashLogbackEncoderVersion by extra("6.6")
 val tokenSupportVersion by extra("1.3.8")
-val springCloudVersion by extra("2020.0.3")
+val springCloudVersion by extra("2021.0.1")
 val retryVersion by extra("1.3.0")
 val zalandoVersion by extra("0.26.2")
 val awailitilityKotlinVersion by extra("4.1.0")
@@ -141,9 +139,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-contract-stub-runner
     testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
     testImplementation("org.springframework.cloud:spring-cloud-starter")
-
-    // SpringFox
-    implementation("io.springfox:springfox-boot-starter:$springfoxVersion")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
