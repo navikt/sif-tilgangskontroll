@@ -15,7 +15,10 @@ data class PdlPersonContext(
     val borgerToken: String,
     val callId: String
 ) {
-    val person = runBlocking { pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken, callId) }
+    val person: Person = runBlocking {
+        val person = pdlService.person(JwtToken(borgerToken).personIdent(), borgerToken, callId)
+        person.copy(forelderBarnRelasjon = person.forelderBarnRelasjon.filterNot { it.relatertPersonsIdent == null })
+    }
 
     fun erDød(): Boolean = person.erDød()
     fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon

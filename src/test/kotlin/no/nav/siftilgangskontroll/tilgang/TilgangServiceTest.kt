@@ -1,6 +1,7 @@
 package no.nav.siftilgangskontroll.tilgang
 
 import assertk.assertThat
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -273,6 +274,23 @@ class TilgangServiceTest {
 
         assertThat(aktørId).isNotNull()
         assertThat(aktørId.value).isEqualTo(forventetAktørId)
+    }
+
+    @Test
+    fun `gitt forelderBarnRelasjon med relatertPersonsIdent lik null, forvent at den filtreres ut`() {
+        val relatertPersonsIdent = null
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = relatertPersonsIdent
+                )
+            )
+        }
+
+        val forelderBarnRelasjonRelatertPersonIdent =
+            tilgangService.hentPerson(jwtToken).person!!.forelderBarnRelasjon.map { it.relatertPersonsIdent }
+        assertThat(forelderBarnRelasjonRelatertPersonIdent).doesNotContain(null)
     }
 }
 
