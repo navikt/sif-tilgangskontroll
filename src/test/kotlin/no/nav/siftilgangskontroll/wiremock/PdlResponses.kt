@@ -23,7 +23,7 @@ object PdlResponses {
         ),
         dødsdato: Doedsfall? = null,
         adressebeskyttelse: Adressebeskyttelse? = null,
-        relatertPersonsIdent: String = "123"
+        relatertPersonsIdent: String? = "123"
     ) = Person(
         folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
         foedsel = listOf(fødselsdato),
