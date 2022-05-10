@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.Protected
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.siftilgangskontroll.Routes.AKTØR_ID
 import no.nav.siftilgangskontroll.Routes.BARN
+import no.nav.siftilgangskontroll.Routes.IDENTER
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
 import no.nav.siftilgangskontroll.core.pdl.AktørId
@@ -11,6 +12,7 @@ import no.nav.siftilgangskontroll.core.tilgang.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.pdl.PdlAuthService
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
+import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType
@@ -22,8 +24,7 @@ import java.util.*
 @RequestMapping(TILGANG)
 @ProtectedWithClaims(issuer = "tokenx")
 class TilgangsController(
-    private val tilgangService: TilgangService,
-    private val pdlAuthService: PdlAuthService
+    private val tilgangService: TilgangService, private val pdlAuthService: PdlAuthService
 ) {
     companion object {
         val logger = LoggerFactory.getLogger(TilgangsController::class.java)
@@ -33,11 +34,9 @@ class TilgangsController(
     @Protected
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<TilgangResponsePerson> {
-        val personOppslagRespons =
-            tilgangService.hentPerson(
-                bearerToken = pdlAuthService.borgerToken(),
-                callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
-            )
+        val personOppslagRespons = tilgangService.hentPerson(
+            bearerToken = pdlAuthService.borgerToken(), callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+        )
         logger.info("Hentet tilgang: {}", personOppslagRespons)
 
         return personOppslagRespons.somResponseEntity()
@@ -47,13 +46,12 @@ class TilgangsController(
     @Protected
     @ResponseStatus(OK)
     fun hentTilgangTilBarn(@RequestBody barnTilgangForespørsel: BarnTilgangForespørsel): ResponseEntity<List<TilgangResponseBarn>> {
-        val barnOppslagRespons =
-            tilgangService.hentBarn(
-                barnTilgangForespørsel = barnTilgangForespørsel,
-                bearerToken = pdlAuthService.borgerToken(),
-                systemToken = pdlAuthService.systemToken(),
-                callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
-            )
+        val barnOppslagRespons = tilgangService.hentBarn(
+            barnTilgangForespørsel = barnTilgangForespørsel,
+            bearerToken = pdlAuthService.borgerToken(),
+            systemToken = pdlAuthService.systemToken(),
+            callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+        )
         logger.info("Hentet tilgang: {}", barnOppslagRespons)
 
         return barnOppslagRespons.somResponseEntity()
@@ -63,16 +61,30 @@ class TilgangsController(
     @Protected
     @ResponseStatus(OK)
     fun hentTilgangTilAktørId(@RequestBody aktørIdTilgangForespørsel: AktørIdTilgangForespørsel): AktørId {
-        val aktørId =
-            tilgangService.hentAktørId(
-                ident = aktørIdTilgangForespørsel.ident,
-                identGruppe = IdentGruppe.AKTORID,
-                borgerToken = pdlAuthService.borgerToken(),
-                callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
-            )
+        val aktørId = tilgangService.hentAktørId(
+            ident = aktørIdTilgangForespørsel.ident,
+            identGruppe = IdentGruppe.AKTORID,
+            borgerToken = pdlAuthService.borgerToken(),
+            callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+        )
         logger.info("Hentet aktørId: {}", aktørId)
 
         return aktørId
+    }
+
+    @PostMapping(IDENTER, produces = [MediaType.APPLICATION_JSON_VALUE])
+    @Protected
+    @ResponseStatus(OK)
+    fun hentIdenter(@RequestBody hentIdenterForespørsel: HentIdenterForespørsel): List<HentIdenterBolkResult> {
+        val identerBolkResults = tilgangService.hentIdenter(
+            identer = hentIdenterForespørsel.identer,
+            identGrupper = hentIdenterForespørsel.identGrupper,
+            systemToken = pdlAuthService.systemToken(),
+            callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+        )
+        logger.info("Hentet aktørId: {}", identerBolkResults)
+
+        return identerBolkResults
     }
 }
 

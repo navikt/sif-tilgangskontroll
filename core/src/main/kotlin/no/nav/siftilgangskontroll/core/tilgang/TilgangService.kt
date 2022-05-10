@@ -11,6 +11,7 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang til barn`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
+import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -115,6 +116,16 @@ class TilgangService(
             borgerToken = borgerToken,
             callId = callId
         ).identer.tilAktørId()
+    }
+
+    fun hentIdenter(identer: List<String>, identGrupper: List<IdentGruppe>, systemToken: String, callId: String = UUID.randomUUID().toString()): List<HentIdenterBolkResult> {
+        return PdlIdenterBolkContext(
+            pdlService = pdlService,
+            identer = identer,
+            identGrupper = identGrupper,
+            systemToken = systemToken,
+            callId = callId
+        ).identerBolkResults
     }
 }
 

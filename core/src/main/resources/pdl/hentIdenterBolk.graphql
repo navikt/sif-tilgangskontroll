@@ -1,0 +1,10 @@
+query($identer: [ID!]!, $grupper: [IdentGruppe!]) {
+    hentIdenterBolk(identer: $identer, grupper: $grupper, historikk: false) {
+        ident
+        identer {
+            ident
+            gruppe
+        }
+        code
+    }
+}
