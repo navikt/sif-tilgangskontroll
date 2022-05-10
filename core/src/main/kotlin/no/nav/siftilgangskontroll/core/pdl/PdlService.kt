@@ -134,12 +134,12 @@ class PdlService(
         return when {
             !result.errors.isNullOrEmpty() -> {
                 val errorSomJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result.errors)
-                logger.error("Feil ved henting av ident. Årsak: {}", errorSomJson)
-                throw IllegalStateException("Feil ved henting av ident.")
+                logger.error("Feil ved henting av identer. Årsak: {}", errorSomJson)
+                throw IllegalStateException("Feil ved henting av identer.")
             }
             result.data!!.hentIdenterBolk.isNotEmpty() -> result.data!!.hentIdenterBolk
             else -> {
-                throw IllegalStateException("Feil ved henting av ident.")
+                throw IllegalStateException("Feil ved henting av identer.")
             }
         }
     }
