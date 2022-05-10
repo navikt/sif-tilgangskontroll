@@ -78,13 +78,15 @@ class PdlService(
         }
     }
 
-    internal suspend fun aktørId(ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString()): List<IdentInformasjon> {
+    internal suspend fun hentIdent(
+        ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString(), identGruppe: IdentGruppe
+    ): List<IdentInformasjon> {
         val result = when(graphQLClient) {
-            is GraphQLWebClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(IdentGruppe.AKTORID)))) {
+            is GraphQLWebClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(identGruppe)))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
                 header(NAV_CALL_ID, callId)
             }
-            is GraphQLKtorClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(IdentGruppe.AKTORID)))) {
+            is GraphQLKtorClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(identGruppe)))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
                 header(NAV_CALL_ID, callId)
             }
