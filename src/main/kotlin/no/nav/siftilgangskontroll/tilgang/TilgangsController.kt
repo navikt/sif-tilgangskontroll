@@ -10,6 +10,7 @@ import no.nav.siftilgangskontroll.core.pdl.AktørId
 import no.nav.siftilgangskontroll.core.tilgang.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.pdl.PdlAuthService
+import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType
@@ -65,6 +66,7 @@ class TilgangsController(
         val aktørId =
             tilgangService.hentAktørId(
                 ident = aktørIdTilgangForespørsel.ident,
+                identGruppe = IdentGruppe.AKTORID,
                 borgerToken = pdlAuthService.borgerToken(),
                 callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
             )

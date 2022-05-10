@@ -10,6 +10,7 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang til barn`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
+import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -106,10 +107,11 @@ class TilgangService(
             })
     }
 
-    fun hentAktørId(ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString()): AktørId {
+    fun hentAktørId(ident: String, identGruppe: IdentGruppe, borgerToken: String, callId: String = UUID.randomUUID().toString()): AktørId {
         return PdlAktørIdContext(
             pdlService = pdlService,
             ident = ident,
+            identGruppe = identGruppe,
             borgerToken = borgerToken,
             callId = callId
         ).identer.tilAktørId()
