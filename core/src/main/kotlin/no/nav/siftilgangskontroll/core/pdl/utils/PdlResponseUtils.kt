@@ -56,7 +56,7 @@ fun pdlHentIdenterBolkResponse(
     """
         {
           "data": {
-            "hentIdentBolk": ${identerBolkResult.somJsonArray()}
+            "hentIdenterBolk": ${identerBolkResult.somJsonArray()}
           }
         }
     """.trimIndent()
