@@ -3,12 +3,15 @@ package no.nav.siftilgangskontroll.core.pdl.utils
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
+import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import org.json.JSONArray
 import org.json.JSONObject
 
 fun Person.somJsonObject() = JSONObject(this)
 fun List<HentPersonBolkResult>.somJsonArray() = JSONArray(this)
+@JvmName("somJsonArrayHentIdenterBolkResult")
+fun List<HentIdenterBolkResult>.somJsonArray() = JSONArray(this)
 
 fun List<Navn>.navnSomJsonArray() = JSONArray(
     map {

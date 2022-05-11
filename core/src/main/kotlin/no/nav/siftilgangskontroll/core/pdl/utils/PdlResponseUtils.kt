@@ -2,12 +2,14 @@ package no.nav.siftilgangskontroll.core.pdl.utils
 
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.HentPersonBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
+import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 
 enum class PdlOperasjon(val navn: String) {
     HENT_PERSON("hentPerson"),
     HENT_PERSON_BOLK("hentPersonBolk"),
-    HENT_IDENTER("hentIdenter")
+    HENT_IDENTER("hentIdenter"),
+    HENT_IDENTER_BOLK("hentIdenterBolk")
 }
 
 fun pdlHentPersonResponse(
@@ -46,3 +48,15 @@ fun pdlHentIdenterResponse(
         }
     }
 }""".trimIndent()
+
+fun pdlHentIdenterBolkResponse(
+    identerBolkResult: List<HentIdenterBolkResult>
+): String =
+    //language=json
+    """
+        {
+          "data": {
+            "hentIdentBolk": ${identerBolkResult.somJsonArray()}
+          }
+        }
+    """.trimIndent()
