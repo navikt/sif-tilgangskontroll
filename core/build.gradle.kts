@@ -6,7 +6,7 @@ plugins {
 
 val tokenSupportVersion by extra("2.0.14")
 val okHttp3Version by extra("4.9.1")
-val graphQLKotlinVersion by extra("5.3.2")
+val graphQLKotlinVersion by extra("5.4.1")
 
 ext["okhttp3.version"] = okHttp3Version
 
