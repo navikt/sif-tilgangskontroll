@@ -24,7 +24,7 @@ val mockkVersion by extra("1.12.3")
 val guavaVersion by extra("31.1-jre")
 val okHttp3Version by extra("4.9.1")
 val orgJsonVersion by extra("20210307")
-val graphQLKotlinVersion by extra("5.3.2")
+val graphQLKotlinVersion by extra("5.5.0")
 val jacksonKotlinModuleVersion by extra("2.12.5")
 
 configurations {

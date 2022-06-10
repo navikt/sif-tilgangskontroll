@@ -6,7 +6,7 @@ plugins {
 
 val tokenSupportVersion by extra("2.0.14")
 val okHttp3Version by extra("4.9.1")
-val graphQLKotlinVersion by extra("5.4.1")
+val graphQLKotlinVersion by extra("5.5.0")
 
 ext["okhttp3.version"] = okHttp3Version
 
@@ -14,8 +14,7 @@ dependencies {
     implementation(project(":spesification"))
 
     // NAV
-    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-    testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
+    implementation("no.nav.security:token-validation-core:$tokenSupportVersion")
 
     //graphql
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
