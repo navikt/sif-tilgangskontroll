@@ -10,8 +10,8 @@ plugins {
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-val kotlinVersion by extra("1.5.31")
-val kotlinXVersion by extra("1.5.2")
+val kotlinVersion by extra("1.7.0")
+val kotlinXVersion by extra("1.6.2")
 val logstashLogbackEncoderVersion by extra("6.6")
 val tokenSupportVersion by extra("2.0.14")
 val springCloudVersion by extra("2021.0.1")
@@ -24,7 +24,7 @@ val mockkVersion by extra("1.12.3")
 val guavaVersion by extra("31.1-jre")
 val okHttp3Version by extra("4.9.1")
 val orgJsonVersion by extra("20210307")
-val graphQLKotlinVersion by extra("5.5.0")
+val graphQLKotlinVersion by extra("6.0.0-alpha.4")
 val jacksonKotlinModuleVersion by extra("2.12.5")
 
 configurations {
