@@ -18,7 +18,7 @@ dependencies {
 
     //graphql
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
-    implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
+    annotationProcessor("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
         exclude("com.expediagroup", "graphql-kotlin-client-serialization")
     }
 }
