@@ -4,8 +4,8 @@ plugins {
     id("com.expediagroup.graphql")  version "6.2.5"
 }
 
-val tokenSupportVersion by extra("2.1.4")
-val okHttp3Version by extra("4.10.1")
+val tokenSupportVersion by extra("2.1.6")
+val okHttp3Version by extra("4.14.2")
 val graphQLKotlinVersion by extra("6.2.5")
 
 ext["okhttp3.version"] = okHttp3Version
