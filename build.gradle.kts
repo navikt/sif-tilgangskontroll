@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
-    id("org.springframework.boot") version "2.7.5"
+    id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.7.20"
-    kotlin("plugin.spring") version "1.7.20"
+    kotlin("jvm") version "1.7.22"
+    kotlin("plugin.spring") version "1.7.22"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -13,18 +13,16 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 val kotlinVersion by extra("1.7.20")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.2")
-val tokenSupportVersion by extra("2.1.6")
-val springCloudVersion by extra("2021.0.4")
-val retryVersion by extra("1.3.4")
-val zalandoVersion by extra("0.27.0")
+val tokenSupportVersion by extra("3.0.2")
+val springCloudVersion by extra("2022.0.0")
+val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
 val assertkJvmVersion by extra("0.25")
 val springMockkVersion by extra("3.1.1")
 val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("31.1-jre")
-val okHttp3Version by extra("4.10.0")
 val orgJsonVersion by extra("20220924")
-val graphQLKotlinVersion by extra("6.2.5")
+val graphQLKotlinVersion by extra("6.3.3")
 val jacksonKotlinModuleVersion by extra("2.13.4")
 
 configurations {
@@ -53,13 +51,6 @@ allprojects {
 
     afterEvaluate {
         dependencies {
-
-            // Overstyrer snakeyaml grunnet sårbarhet i v1.30. Kan fjernes når avhengiheter har oppdatert.
-            implementation("org.yaml:snakeyaml") {
-                version {
-                    strictly("1.32")
-                }
-            }
 
             // Logging
             implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
@@ -108,8 +99,6 @@ subprojects {
     }
 }
 
-ext["okhttp3.version"] = okHttp3Version
-
 dependencies {
     implementation(project(":spesification"))
     implementation(project(":core"))
@@ -122,20 +111,15 @@ dependencies {
     implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
 
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
-    testImplementation("com.squareup.okhttp3:okhttp:$okHttp3Version")
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
-    }
-    implementation("org.springframework.boot:spring-boot-starter-jetty")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.retry:spring-retry:$retryVersion")
     implementation("org.springframework:spring-aspects")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    annotationProcessor("org.springframework.boot:spring-boot-autoconfigure-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "junit")
         exclude(module = "mockito-core")
@@ -156,7 +140,6 @@ dependencies {
 
     // Diverse
     implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("org.zalando:problem-spring-web-starter:$zalandoVersion")
     implementation("com.google.guava:guava:$guavaVersion")
     testImplementation("org.awaitility:awaitility-kotlin:$awailitilityKotlinVersion")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:$assertkJvmVersion")

@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import org.zalando.problem.jackson.ProblemModule
-import org.zalando.problem.violations.ConstraintViolationProblemModule
 
 @Configuration
 class WebMvcConfig() : WebMvcConfigurer {
@@ -34,16 +32,6 @@ class WebMvcConfig() : WebMvcConfigurer {
             .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
         super.addResourceHandlers(registry)
-    }
-
-    @Bean
-    fun problemModules(): ProblemModule {
-        return ProblemModule()
-    }
-
-    @Bean
-    fun violationProblemModule(): ConstraintViolationProblemModule {
-        return ConstraintViolationProblemModule()
     }
 
     @Bean

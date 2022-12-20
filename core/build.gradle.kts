@@ -1,14 +1,12 @@
 
 plugins {
     kotlin("jvm")
-    id("com.expediagroup.graphql")  version "6.2.5"
+    id("com.expediagroup.graphql")  version "6.3.3"
 }
 
-val tokenSupportVersion by extra("2.1.6")
-val okHttp3Version by extra("4.10.0")
-val graphQLKotlinVersion by extra("6.2.5")
+val tokenSupportVersion by extra("3.0.2")
 
-ext["okhttp3.version"] = okHttp3Version
+val graphQLKotlinVersion by extra("6.3.3")
 
 dependencies {
     implementation(project(":spesification"))
