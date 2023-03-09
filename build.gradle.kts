@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
-    id("org.springframework.boot") version "3.0.0"
+    id("org.springframework.boot") version "3.0.4"
     id("io.spring.dependency-management") version "1.1.0"
-    kotlin("jvm") version "1.7.22"
-    kotlin("plugin.spring") version "1.7.22"
+    kotlin("jvm") version "1.8.10"
+    kotlin("plugin.spring") version "1.8.10"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -21,7 +21,7 @@ val assertkJvmVersion by extra("0.25")
 val springMockkVersion by extra("3.1.1")
 val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("31.1-jre")
-val orgJsonVersion by extra("20220924")
+val orgJsonVersion by extra("20230227")
 val graphQLKotlinVersion by extra("6.3.3")
 val jacksonKotlinModuleVersion by extra("2.13.4")
 
