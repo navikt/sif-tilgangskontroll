@@ -13,7 +13,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 val kotlinVersion by extra("1.7.20")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.2")
-val tokenSupportVersion by extra("3.0.8")
+val tokenSupportVersion by extra("3.0.9")
 val springCloudVersion by extra("2022.0.0")
 val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
