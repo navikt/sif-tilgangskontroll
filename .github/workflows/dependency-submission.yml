@@ -1,0 +1,20 @@
+name: Dependency Submission
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.gradle.kts"
+      - ".github/workflows/dependency-submission.yml"
+  workflow_dispatch:
+
+jobs:
+  scan:
+    uses: mikepenz/gradle-dependency-submission@aa82af7186ba17eb630a7d47c840ba8a3185ac91
+    with:
+      gradle-project-path: |-
+        sif-tilgangskontroll
+      gradle-build-module: |-
+        :app
+        :core
+        :spesification
