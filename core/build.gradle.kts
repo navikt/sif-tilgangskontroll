@@ -1,7 +1,7 @@
 
 plugins {
     kotlin("jvm")
-    id("com.expediagroup.graphql")  version "6.4.1"
+    id("com.expediagroup.graphql") version "6.4.1"
 }
 
 val tokenSupportVersion by extra("3.0.12")
@@ -18,6 +18,14 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
     implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
         exclude("com.expediagroup", "graphql-kotlin-client-serialization")
+    }
+    constraints {
+        implementation("org.springframework:spring-core") {
+            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/4")
+            version {
+                require("5.3.27")
+            }
+        }
     }
 }
 
