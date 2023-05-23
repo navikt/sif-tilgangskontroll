@@ -19,11 +19,30 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
         exclude("com.expediagroup", "graphql-kotlin-client-serialization")
     }
+
     constraints {
+        implementation("com.fasterxml.jackson.core:jackson-databind") {
+            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/2")
+            version {
+                require("2.15.1")
+            }
+        }
         implementation("org.springframework:spring-core") {
             because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/4")
             version {
                 require("5.3.27")
+            }
+        }
+        implementation("org.springframework:spring-web") {
+            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/5")
+            version {
+                require("6.0.0")
+            }
+        }
+        implementation("io.projectreactor.netty:reactor-netty-http") {
+            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/6")
+            version {
+                require("1.0.24")
             }
         }
     }
