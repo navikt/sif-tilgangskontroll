@@ -30,7 +30,7 @@ dependencies {
         implementation("org.springframework:spring-core") {
             because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/4")
             version {
-                require("5.3.27")
+                require("6.0.8")
             }
         }
         implementation("org.springframework:spring-web") {
