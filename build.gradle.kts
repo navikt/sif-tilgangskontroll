@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
-    id("org.springframework.boot") version "3.0.6"
+    id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.spring") version "1.8.21"
@@ -13,8 +13,8 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 val kotlinVersion by extra("1.8.21")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.2")
-val tokenSupportVersion by extra("3.0.9")
-val springCloudVersion by extra("2022.0.0")
+val tokenSupportVersion by extra("3.1.0")
+val springCloudVersion by extra("4.0.3")
 val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
 val assertkJvmVersion by extra("0.25")
@@ -22,7 +22,7 @@ val springMockkVersion by extra("3.1.1")
 val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("31.1-jre")
 val orgJsonVersion by extra("20230227")
-val graphQLKotlinVersion by extra("6.3.3")
+val graphQLKotlinVersion by extra("6.5.0")
 val jacksonKotlinModuleVersion by extra("2.15.0")
 
 configurations {
@@ -129,8 +129,7 @@ dependencies {
 
     // Spring Cloud
     // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-contract-stub-runner
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
-    testImplementation("org.springframework.cloud:spring-cloud-starter")
+    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$springCloudVersion")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -145,12 +144,6 @@ dependencies {
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:$assertkJvmVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
 }
 
 tasks.withType<Test> {
