@@ -37,6 +37,8 @@ class PdlService(
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
 
+        if (!result.extensions.isNullOrEmpty()) logger.info("PDL response extensions: ${result.extensions}")
+
         return when {
             !result.errors.isNullOrEmpty() -> {
                 val errorSomJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result.errors)
@@ -67,6 +69,8 @@ class PdlService(
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
 
+        if (!result.extensions.isNullOrEmpty()) logger.info("Warning: PDL response: ${result.extensions}")
+
         return when {
             !result.errors.isNullOrEmpty() -> {
                 val errorSomJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result.errors)
@@ -94,6 +98,8 @@ class PdlService(
             }
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
+
+        if (!result.extensions.isNullOrEmpty()) logger.info("Warning: PDL response: ${result.extensions}")
 
         return when {
             !result.errors.isNullOrEmpty() -> {
@@ -130,6 +136,8 @@ class PdlService(
             }
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
+
+        if (!result.extensions.isNullOrEmpty()) logger.info("Warning: PDL response: ${result.extensions}")
 
         return when {
             !result.errors.isNullOrEmpty() -> {
