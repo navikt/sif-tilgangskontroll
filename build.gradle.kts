@@ -52,6 +52,13 @@ allprojects {
     afterEvaluate {
         dependencies {
 
+            implementation("org.yaml:snakeyaml") {
+                version {
+                    strictly("2.0")
+                    because("https://github.com/navikt/sif-tilgangskontroll/security/code-scanning/2")
+                }
+            }
+
             // Logging
             implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
             // Kotlin
