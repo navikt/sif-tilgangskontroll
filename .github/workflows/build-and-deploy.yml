@@ -72,22 +72,3 @@ jobs:
           CLUSTER: dev-gcp
           RESOURCE: nais/naiserator.yml
           VARS: nais/dev-gcp.json
-
-  publish-packages:
-    name: Publish packages
-    if: startsWith(github.ref, 'refs/heads/master') # Build and push docker if branch is master
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: corretto
-          cache: gradle
-      - name: Build JAR
-        run: ./gradlew clean build -x test # Creates a combined JAR of project and runTime dependencies.
-      - name: publish packages
-        run: ./scripts/set-project-version-and-publish.sh
