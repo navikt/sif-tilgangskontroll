@@ -53,6 +53,7 @@ jobs:
     with:
       team: dusseldorf
       readertoken: false
+      buildcommand: '--configuration-cache build -x test'
 
   trivy:
     needs: [ build ]
