@@ -11,6 +11,10 @@ val graphQLKotlinVersion by extra("6.5.0")
 dependencies {
     implementation(project(":spesification"))
 
+    implementation("org.yaml:snakeyaml:2.0") {
+        because("https://github.com/navikt/sif-tilgangskontroll/security/code-scanning/2")
+    }
+
     // NAV
     implementation("no.nav.security:token-validation-core:$tokenSupportVersion")
 
