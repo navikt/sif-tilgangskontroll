@@ -29,6 +29,7 @@ jobs:
     secrets: inherit
     with:
       readertoken: false
+      buildcommand: './gradlew check'
 
   codeql:
     uses: navikt/sif-gha-workflows/.github/workflows/gradle-codeql.yml@main
