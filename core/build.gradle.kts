@@ -6,7 +6,7 @@ plugins {
 
 val tokenSupportVersion by extra("3.1.0")
 
-val graphQLKotlinVersion by extra("6.5.0")
+val graphQLKotlinVersion by extra("7.0.1")
 
 dependencies {
     implementation(project(":spesification"))
