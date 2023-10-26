@@ -5,6 +5,7 @@ import com.expediagroup.graphql.client.spring.GraphQLWebClient
 import com.expediagroup.graphql.client.ktor.GraphQLKtorClient
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.request.*
+import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.pdl.generated.*
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
@@ -21,18 +22,21 @@ class PdlService(
     private companion object {
         private val logger = LoggerFactory.getLogger(PdlService::class.java)
         private const val NAV_CALL_ID = "Nav-Call-Id"
+        private const val BEHANLINGSNUMMER = "Behandlingsnummer"
         private val objectMapper = jacksonObjectMapper()
     }
 
-    internal suspend fun person(ident: String, borgerToken: String, callId: String): Person {
+    internal suspend fun person(ident: String, borgerToken: String, callId: String, behandling: Behandling): Person {
         val result = when (graphQLClient) {
             is GraphQLWebClient -> graphQLClient.execute(HentPerson(HentPerson.Variables(ident))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
                 header(NAV_CALL_ID, callId)
+                header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
             }
             is GraphQLKtorClient -> graphQLClient.execute(HentPerson(HentPerson.Variables(ident))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
                 header(NAV_CALL_ID, callId)
+                header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
             }
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
@@ -55,16 +59,19 @@ class PdlService(
     internal suspend fun barn(
         identer: List<ID>,
         systemToken: String,
-        callId: String = UUID.randomUUID().toString()
+        callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling
     ): List<no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person> {
         val result = when (graphQLClient) {
             is GraphQLWebClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
                 header(NAV_CALL_ID, callId)
+                header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
             }
             is GraphQLKtorClient -> graphQLClient.execute(HentBarn(HentBarn.Variables(identer))) {
                 header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
                 header(NAV_CALL_ID, callId)
+                header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
             }
             else -> throw Exception("Instance of GraphQLClient is not supported")
         }
@@ -85,7 +92,10 @@ class PdlService(
     }
 
     internal suspend fun hentIdent(
-        ident: String, borgerToken: String, callId: String = UUID.randomUUID().toString(), identGruppe: IdentGruppe
+        ident: String,
+        borgerToken: String,
+        callId: String = UUID.randomUUID().toString(),
+        identGruppe: IdentGruppe
     ): List<IdentInformasjon> {
         val result = when (graphQLClient) {
             is GraphQLWebClient -> graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(identGruppe)))) {

@@ -7,6 +7,7 @@ import no.nav.siftilgangskontroll.Routes.BARN
 import no.nav.siftilgangskontroll.Routes.IDENTER
 import no.nav.siftilgangskontroll.Routes.PERSON
 import no.nav.siftilgangskontroll.Routes.TILGANG
+import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.core.pdl.AktørId
 import no.nav.siftilgangskontroll.core.tilgang.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
@@ -38,7 +39,9 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<TilgangResponsePerson> {
         val personOppslagRespons = tilgangService.hentPerson(
-            bearerToken = pdlAuthService.borgerToken(), callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN,
+            bearerToken = pdlAuthService.borgerToken(),
+            callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
         )
         logger.info("Hentet tilgang: {}", personOppslagRespons)
 
@@ -53,6 +56,7 @@ class TilgangsController(
             barnTilgangForespørsel = barnTilgangForespørsel,
             bearerToken = pdlAuthService.borgerToken(),
             systemToken = pdlAuthService.systemToken(),
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN,
             callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
         )
         logger.info("Hentet tilgang: {}", barnOppslagRespons)
