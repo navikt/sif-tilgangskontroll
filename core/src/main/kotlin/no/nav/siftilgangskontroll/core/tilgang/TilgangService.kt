@@ -1,6 +1,7 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
+import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.core.pdl.*
 import no.nav.siftilgangskontroll.core.pdl.BarnContext
 import no.nav.siftilgangskontroll.policy.spesification.evaluate
@@ -46,7 +47,8 @@ class TilgangService(
         barnTilgangForespørsel: BarnTilgangForespørsel,
         bearerToken: String,
         systemToken: String,
-        callId: String = UUID.randomUUID().toString()
+        callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling
     ): List<TilgangResponseBarn> {
 
         val barnContext = BarnContext(
@@ -54,7 +56,8 @@ class TilgangService(
             pdlService = pdlService,
             bearerToken = JwtToken(bearerToken),
             systemtoken = JwtToken(systemToken),
-            callId = callId
+            callId = callId,
+            behandling = behandling
         )
 
         return barnContext.pdlBarn.barn.map { barn ->
@@ -87,11 +90,12 @@ class TilgangService(
      *
      * @return TilgangResponsePerson: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
-    fun hentPerson(bearerToken: String, callId: String = UUID.randomUUID().toString()): TilgangResponsePerson {
+    fun hentPerson(bearerToken: String, callId: String = UUID.randomUUID().toString(), behandling: Behandling): TilgangResponsePerson {
         val personContext = PdlPersonContext(
             pdlService = pdlService,
             borgerToken = bearerToken,
-            callId = callId
+            callId = callId,
+            behandling = behandling
         )
         return evaluate(
             ctx = personContext,

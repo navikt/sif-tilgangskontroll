@@ -7,6 +7,7 @@ import assertk.assertions.isNotNull
 import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.core.pdl.utils.PdlOperasjon
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentIdenterResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonBolkResponse
@@ -89,7 +90,14 @@ class TilgangServiceTest {
         }
 
         val policyEvaluation =
-            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(
+                barnTilgangForespørsel = BarnTilgangForespørsel(
+                    barnIdenter = listOf(relatertPersonsIdent)
+                ),
+                bearerToken = jwtToken,
+                systemToken = jwtToken,
+                behandling = Behandling.PLEIEPENGER_SYKT_BARN
+            )
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -127,7 +135,12 @@ class TilgangServiceTest {
         }
 
         val policyEvaluation =
-            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(
+                barnTilgangForespørsel = BarnTilgangForespørsel(barnIdenter = listOf(relatertPersonsIdent)),
+                bearerToken = jwtToken,
+                systemToken = jwtToken,
+                behandling = Behandling.PLEIEPENGER_SYKT_BARN
+            )
 
         assertThat(policyEvaluation).isNotNull()
         assertThat(policyEvaluation[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -163,8 +176,12 @@ class TilgangServiceTest {
             )
         }
 
-        val barnOppslagRespons =
-            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(ukjentRelasjonIdent)), jwtToken, jwtToken)
+        val barnOppslagRespons = tilgangService.hentBarn(
+            barnTilgangForespørsel = BarnTilgangForespørsel(barnIdenter = listOf(ukjentRelasjonIdent)),
+            bearerToken = jwtToken,
+            systemToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
 
         assertThat(barnOppslagRespons).isNotNull()
         assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -201,7 +218,12 @@ class TilgangServiceTest {
         }
 
         val barnOppslagRespons =
-            tilgangService.hentBarn(BarnTilgangForespørsel(listOf(relatertPersonsIdent)), jwtToken, jwtToken)
+            tilgangService.hentBarn(
+                barnTilgangForespørsel = BarnTilgangForespørsel(barnIdenter = listOf(relatertPersonsIdent)),
+                bearerToken = jwtToken,
+                systemToken = jwtToken,
+                behandling = Behandling.PLEIEPENGER_SYKT_BARN
+            )
 
         assertThat(barnOppslagRespons).isNotNull()
         assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
@@ -225,7 +247,10 @@ class TilgangServiceTest {
             )
         }
 
-        val personOppslagRespons = tilgangService.hentPerson(jwtToken)
+        val personOppslagRespons = tilgangService.hentPerson(
+            bearerToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
 
         assertThat(personOppslagRespons).isNotNull()
         assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -248,7 +273,10 @@ class TilgangServiceTest {
             )
         }
 
-        val personOppslagRespons = tilgangService.hentPerson(jwtToken)
+        val personOppslagRespons = tilgangService.hentPerson(
+            bearerToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
 
         assertThat(personOppslagRespons).isNotNull()
         assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
@@ -264,13 +292,14 @@ class TilgangServiceTest {
     fun `test aktørId`() {
 
         val forventetAktørId = "123456"
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER) {
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER, medbehandlingsnummer = false) {
             pdlHentIdenterResponse(
                 identer = defaultHentIdenterResult(forventetAktørId, IdentGruppe.AKTORID)
             )
         }
 
-        val aktørId = tilgangService.hentAktørId(ident = "123", identGruppe = IdentGruppe.AKTORID, borgerToken = jwtToken)
+        val aktørId =
+            tilgangService.hentAktørId(ident = "123", identGruppe = IdentGruppe.AKTORID, borgerToken = jwtToken)
 
         assertThat(aktørId).isNotNull()
         assertThat(aktørId.value).isEqualTo(forventetAktørId)
@@ -288,8 +317,10 @@ class TilgangServiceTest {
             )
         }
 
-        val forelderBarnRelasjonRelatertPersonIdent =
-            tilgangService.hentPerson(jwtToken).person!!.forelderBarnRelasjon.map { it.relatertPersonsIdent }
+        val forelderBarnRelasjonRelatertPersonIdent = tilgangService.hentPerson(
+            bearerToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        ).person!!.forelderBarnRelasjon.map { it.relatertPersonsIdent }
         assertThat(forelderBarnRelasjonRelatertPersonIdent).doesNotContain(null)
     }
 }
@@ -305,5 +336,5 @@ private fun List<PolicyEvaluation>.resultat() =
 
 private data class PolicyEvaluationResult(
     val id: String,
-    val decision: PolicyDecision
+    val decision: PolicyDecision,
 )
