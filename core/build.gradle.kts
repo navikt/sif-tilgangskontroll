@@ -40,9 +40,9 @@ dependencies {
             }
         }
         implementation("io.projectreactor.netty:reactor-netty-http") {
-            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/6")
+            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/22")
             version {
-                require("1.0.24")
+                require("1.1.13")
             }
         }
     }

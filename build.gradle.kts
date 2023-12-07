@@ -21,7 +21,7 @@ val assertkJvmVersion by extra("0.25")
 val springMockkVersion by extra("3.1.1")
 val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("31.1-jre")
-val orgJsonVersion by extra("20230227")
+val orgJsonVersion by extra("20231013")
 val graphQLKotlinVersion by extra("7.0.2")
 val jacksonKotlinModuleVersion by extra("2.15.0")
 
