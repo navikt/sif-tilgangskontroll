@@ -68,15 +68,3 @@ jobs:
     with:
       image: ${{ needs.build.outputs.image }}
       team: dusseldorf
-
-  deploy:
-    needs: [ test, build ]
-    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') # Deploy if branch is either master or dev-*
-    uses: navikt/sif-gha-workflows/.github/workflows/gradle-deploy.yml@main
-    permissions:
-      contents: read
-    secrets: inherit
-    with:
-      image: ${{ needs.build.outputs.image }}
-      environment: gcp
-      deploy-prod: false
