@@ -128,7 +128,7 @@ class TilgangServiceTest {
                 personBolk = listOf(
                     defaultHentPersonBolkResult(
                         folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
-                        fødselsdato = BarnFødsel("2002-01-01")
+                        fødselsdato = BarnFødsel(foedselsdato = "2002-01-01", foedselsaar = 2002)
                     )
                 )
             )
@@ -266,9 +266,10 @@ class TilgangServiceTest {
     fun `gitt NAV-bruker er under myndighetsalder (18), forvent nektet tilgang`() {
 
         wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            val fødselsdato = LocalDate.now().minusYears(17)
             pdlHentPersonResponse(
                 person = defaultHentPersonResult(
-                    fødselsdato = Foedsel(LocalDate.now().minusYears(17).toString())
+                    foedsel = Foedsel(fødselsdato.toString(), fødselsdato.year)
                 )
             )
         }

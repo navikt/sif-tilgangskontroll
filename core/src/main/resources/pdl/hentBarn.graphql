@@ -12,6 +12,7 @@ query($identer: [ID!]!) {
             },
             foedsel {
                 foedselsdato
+                foedselsaar
             }
             doedsfall {
                 doedsdato
