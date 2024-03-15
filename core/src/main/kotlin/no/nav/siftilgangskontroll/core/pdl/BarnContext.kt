@@ -31,13 +31,9 @@ data class PdlBarn(
     fun fødselsdato(ident: BarnIdent): LocalDate = barn
         .filtererPåIdent(ident)
         .fødselsdato()
-    fun fødselsÅr(ident: BarnIdent): Int = barn
-        .filtererPåIdent(ident)
-        .fødselsÅr()
 
     fun erMyndig(ident: BarnIdent): Boolean {
-        val nåværendeÅr = LocalDate.now().year
-        val alder = nåværendeÅr - fødselsÅr(ident)
+        val alder = Period.between(fødselsdato(ident), LocalDate.now()).years
         return alder >= MYNDIG_ALDER
     }
 }
@@ -74,7 +70,6 @@ fun Person.harAdresseSkjerming(): Boolean = adressebeskyttelse.isNotEmpty()
 
 fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
 fun Person.fødselsdato(): LocalDate = LocalDate.parse(foedsel.first().foedselsdato!!)
-fun Person.fødselsÅr(): Int = foedsel.first().foedselsaar!!
 
 fun List<Person>.filtererPåIdent(ident: BarnIdent) =
     first { it.folkeregisteridentifikator.first().identifikasjonsnummer == ident }
