@@ -7,7 +7,7 @@ import no.nav.siftilgangskontroll.core.pdl.BarnContext
 import no.nav.siftilgangskontroll.core.pdl.PdlAktørIdContext
 import no.nav.siftilgangskontroll.core.pdl.PdlIdenterBolkContext
 import no.nav.siftilgangskontroll.core.pdl.PdlPersonContext
-import no.nav.siftilgangskontroll.core.pdl.PdlPersonPersonOppslagContext
+import no.nav.siftilgangskontroll.core.pdl.PdlRelatertPersonOppslagContext
 import no.nav.siftilgangskontroll.core.pdl.PdlService
 import no.nav.siftilgangskontroll.core.pdl.ident
 import no.nav.siftilgangskontroll.core.pdl.tilAktørId
@@ -149,7 +149,7 @@ class TilgangService(
      * @return TilgangResponsePersonOppslag: Person som ble slått opp.
      */
     fun slåOppPerson(ident: String, bearerToken: String, callId: String = UUID.randomUUID().toString(), behandling: Behandling): TilgangResponsePerson {
-        val pdlPersonPersonOppslagContext = PdlPersonPersonOppslagContext(
+        val pdlRelatertPersonOppslagContext = PdlRelatertPersonOppslagContext(
             pdlService = pdlService,
             ident = ident,
             borgerToken = bearerToken,
@@ -158,16 +158,16 @@ class TilgangService(
         )
 
         return evaluate(
-            ctx = pdlPersonPersonOppslagContext,
+            ctx = pdlRelatertPersonOppslagContext,
             policy = `NAV-bruker er kjent relasjon`(),
             block = {
                 when (it.decision) {
                     PolicyDecision.PERMIT -> TilgangResponsePerson(
-                        pdlPersonPersonOppslagContext.ident,
-                        pdlPersonPersonOppslagContext.person,
+                        pdlRelatertPersonOppslagContext.ident,
+                        pdlRelatertPersonOppslagContext.person,
                         it
                     )
-                    else -> TilgangResponsePerson(pdlPersonPersonOppslagContext.ident, null, it)
+                    else -> TilgangResponsePerson(pdlRelatertPersonOppslagContext.ident, null, it)
                 }
             })
     }

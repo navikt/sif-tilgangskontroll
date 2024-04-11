@@ -70,7 +70,7 @@ object Policies {
             }
         }
 
-    internal fun `NAV-bruker er kjent relasjon`(): Policy<PdlPersonPersonOppslagContext> =
+    internal fun `NAV-bruker er kjent relasjon`(): Policy<PdlRelatertPersonOppslagContext> =
         policy {
             id = "SIF.5"
             description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"

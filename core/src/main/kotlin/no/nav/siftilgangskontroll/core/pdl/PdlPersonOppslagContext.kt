@@ -7,7 +7,7 @@ import no.nav.siftilgangskontroll.core.utils.personIdent
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import java.time.LocalDate
 
-data class PdlPersonPersonOppslagContext(
+data class PdlRelatertPersonOppslagContext(
     private val pdlService: PdlService,
     private val behandling: Behandling,
     val ident: String,
