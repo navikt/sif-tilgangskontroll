@@ -1,7 +1,9 @@
 package no.nav.siftilgangskontroll.core.tilgang
 
-import no.nav.siftilgangskontroll.core.pdl.*
 import no.nav.siftilgangskontroll.core.pdl.BarnContext
+import no.nav.siftilgangskontroll.core.pdl.BarnIdent
+import no.nav.siftilgangskontroll.core.pdl.MYNDIG_ALDER
+import no.nav.siftilgangskontroll.core.pdl.PdlPersonContext
 import no.nav.siftilgangskontroll.policy.spesification.Policy
 import no.nav.siftilgangskontroll.policy.spesification.Policy.Companion.policy
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation.Companion.deny
@@ -66,19 +68,6 @@ object Policies {
                 when (pdlBarn.erMyndig(ident)) {
                     true -> deny("Barn er over myndighetsalder")
                     else -> permit("Barn er under myndighetsalder ")
-                }
-            }
-        }
-
-    internal fun `NAV-bruker er kjent relasjon`(): Policy<PdlRelatertPersonOppslagContext> =
-        policy {
-            id = "SIF.5"
-            description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
-            evaluation = {
-
-                when {
-                    erKjentRelasjon() -> permit("Relasjon er kjent")
-                    else -> deny("NAV-bruker har ikke tilgang til ukjent relasjon")
                 }
             }
         }
