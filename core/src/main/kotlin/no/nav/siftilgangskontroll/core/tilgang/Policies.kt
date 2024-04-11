@@ -70,6 +70,19 @@ object Policies {
             }
         }
 
+    internal fun `NAV-bruker er kjent relasjon`(): Policy<PdlPersonPersonOppslagContext> =
+        policy {
+            id = "SIF.5"
+            description = "NAV-bruker skal ikke ha tilgang til ukjent relasjon"
+            evaluation = {
+
+                when {
+                    erKjentRelasjon() -> permit("Relasjon er kjent")
+                    else -> deny("NAV-bruker har ikke tilgang til ukjent relasjon")
+                }
+            }
+        }
+
     internal fun `NAV-bruker er i live`(): Policy<PdlPersonContext> =
         policy {
             id = "FP.10"

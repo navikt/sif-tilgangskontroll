@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
@@ -323,6 +324,52 @@ class TilgangServiceTest {
             behandling = Behandling.PLEIEPENGER_SYKT_BARN
         ).person!!.forelderBarnRelasjon.map { it.relatertPersonsIdent }
         assertThat(forelderBarnRelasjonRelatertPersonIdent).doesNotContain(null)
+    }
+
+    @Test
+    fun `Oppslag på kjent relasjon gir permit`() {
+        val relatertPersonsIdent = "12345678910"
+        val oppslagIdent = "123"
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(person = defaultHentPersonResult(
+                relatertPersonsIdent = relatertPersonsIdent
+            ))
+        }
+
+        val personOppslagRespons = tilgangService.slåOppPerson(
+            bearerToken = jwtToken,
+            ident = oppslagIdent,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
+
+        assertThat(personOppslagRespons).isNotNull()
+        assertThat(personOppslagRespons.policyEvaluation.id).isEqualTo("SIF.5")
+        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
+        assertThat(personOppslagRespons.ident).isEqualTo(oppslagIdent)
+        assertThat(personOppslagRespons.person).isNotNull()
+    }
+
+    @Test
+    fun `Oppslag på ukjent relasjon gir deny`() {
+        val relatertPersonsIdent = "987654321"
+        val oppslagIdent = "123"
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(person = defaultHentPersonResult(
+                relatertPersonsIdent = relatertPersonsIdent
+            ))
+        }
+
+        val personOppslagRespons = tilgangService.slåOppPerson(
+            bearerToken = jwtToken,
+            ident = oppslagIdent,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
+
+        assertThat(personOppslagRespons).isNotNull()
+        assertThat(personOppslagRespons.policyEvaluation.id).isEqualTo("SIF.5")
+        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(personOppslagRespons.ident).isEqualTo(oppslagIdent)
+        assertThat(personOppslagRespons.person).isNull()
     }
 }
 
