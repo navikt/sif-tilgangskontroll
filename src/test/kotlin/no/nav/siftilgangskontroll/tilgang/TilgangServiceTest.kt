@@ -2,9 +2,9 @@ package no.nav.siftilgangskontroll.tilgang
 
 import assertk.assertThat
 import assertk.assertions.doesNotContain
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import assertk.assertions.isNull
 import com.github.tomakehurst.wiremock.WireMockServer
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
@@ -13,6 +13,7 @@ import no.nav.siftilgangskontroll.core.pdl.utils.PdlOperasjon
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentIdenterResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonBolkResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonResponse
+import no.nav.siftilgangskontroll.core.tilgang.BarnResponse
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
 import no.nav.siftilgangskontroll.core.tilgang.TilgangService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering.STRENGT_FORTROLIG
@@ -327,49 +328,27 @@ class TilgangServiceTest {
     }
 
     @Test
-    fun `Oppslag på kjent relasjon gir permit`() {
-        val relatertPersonsIdent = "12345678910"
+    fun `Hent liste med barn`() {
         val oppslagIdent = "123"
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
-            pdlHentPersonResponse(person = defaultHentPersonResult(
-                relatertPersonsIdent = relatertPersonsIdent
-            ))
+        val relatertPersonsIdent = "456"
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
+                        fødselsdato = BarnFødsel(foedselsdato = "2002-01-01", foedselsaar = 2002)
+                    )
+                )
+            )
         }
 
-        val personOppslagRespons = tilgangService.slåOppPerson(
-            bearerToken = jwtToken,
-            ident = oppslagIdent,
+        val barn: List<BarnResponse> = tilgangService.slåOppBarn(
+            systemToken = jwtToken,
+            barnTilgangForespørsel = BarnTilgangForespørsel(barnIdenter = listOf(oppslagIdent)),
             behandling = Behandling.PLEIEPENGER_SYKT_BARN
         )
 
-        assertThat(personOppslagRespons).isNotNull()
-        assertThat(personOppslagRespons.policyEvaluation.id).isEqualTo("SIF.5")
-        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.PERMIT)
-        assertThat(personOppslagRespons.ident).isEqualTo(oppslagIdent)
-        assertThat(personOppslagRespons.person).isNotNull()
-    }
-
-    @Test
-    fun `Oppslag på ukjent relasjon gir deny`() {
-        val relatertPersonsIdent = "987654321"
-        val oppslagIdent = "123"
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
-            pdlHentPersonResponse(person = defaultHentPersonResult(
-                relatertPersonsIdent = relatertPersonsIdent
-            ))
-        }
-
-        val personOppslagRespons = tilgangService.slåOppPerson(
-            bearerToken = jwtToken,
-            ident = oppslagIdent,
-            behandling = Behandling.PLEIEPENGER_SYKT_BARN
-        )
-
-        assertThat(personOppslagRespons).isNotNull()
-        assertThat(personOppslagRespons.policyEvaluation.id).isEqualTo("SIF.5")
-        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
-        assertThat(personOppslagRespons.ident).isEqualTo(oppslagIdent)
-        assertThat(personOppslagRespons.person).isNull()
+        assertThat(barn).hasSize(1)
     }
 }
 

@@ -7,7 +7,7 @@ import no.nav.siftilgangskontroll.core.pdl.BarnContext
 import no.nav.siftilgangskontroll.core.pdl.PdlAktørIdContext
 import no.nav.siftilgangskontroll.core.pdl.PdlIdenterBolkContext
 import no.nav.siftilgangskontroll.core.pdl.PdlPersonContext
-import no.nav.siftilgangskontroll.core.pdl.PdlRelatertPersonOppslagContext
+import no.nav.siftilgangskontroll.core.pdl.PdlBarnOppslagContext
 import no.nav.siftilgangskontroll.core.pdl.PdlService
 import no.nav.siftilgangskontroll.core.pdl.ident
 import no.nav.siftilgangskontroll.core.pdl.tilAktørId
@@ -17,7 +17,6 @@ import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er under myndighet
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang til barn`
-import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er kjent relasjon`
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
@@ -29,7 +28,7 @@ import java.util.*
  * Denne klassens ansvar er å hente oppslagsdata, håndhevet gjennom et sett med policier.
  */
 class TilgangService(
-    private val pdlService: PdlService
+    private val pdlService: PdlService,
 ) {
 
     private companion object {
@@ -56,7 +55,7 @@ class TilgangService(
         bearerToken: String,
         systemToken: String,
         callId: String = UUID.randomUUID().toString(),
-        behandling: Behandling
+        behandling: Behandling,
     ): List<TilgangResponseBarn> {
 
         val barnContext = BarnContext(
@@ -87,6 +86,31 @@ class TilgangService(
     }
 
     /**
+     * Slår opp person fra PDL.
+     *
+     * @param barnIdenter: Identifikator til personen som skal slås opp.
+     * @param systemToken: System token. Enten Azure OBO.
+     *
+     * @return TilgangResponsePersonOppslag: Person som ble slått opp.
+     */
+    fun slåOppBarn(
+        barnTilgangForespørsel: BarnTilgangForespørsel,
+        systemToken: String,
+        callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling,
+    ): List<BarnResponse> {
+        return PdlBarnOppslagContext(
+            pdlService = pdlService,
+            barnIdenter = barnTilgangForespørsel.barnIdenter,
+            callId = callId,
+            systemToken = systemToken,
+            behandling = behandling
+        ).barn.map { barn ->
+            BarnResponse(barn.ident(), barn)
+        }
+    }
+
+    /**
      * Henter person fra PDL.
      *
      * Operasjonen håndhever et sett med policier som er avgjørende for å få tilgang til data.
@@ -98,7 +122,11 @@ class TilgangService(
      *
      * @return TilgangResponsePerson: 'data' er null dersom det ikke gitt tilgang. Se 'policyEvaulation' for begrunnelse.
      */
-    fun hentPerson(bearerToken: String, callId: String = UUID.randomUUID().toString(), behandling: Behandling): TilgangResponsePerson {
+    fun hentPerson(
+        bearerToken: String,
+        callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling,
+    ): TilgangResponsePerson {
         val personContext = PdlPersonContext(
             pdlService = pdlService,
             borgerToken = bearerToken,
@@ -115,12 +143,18 @@ class TilgangService(
                         personContext.person,
                         it
                     )
+
                     else -> TilgangResponsePerson(personContext.person.ident(), null, it)
                 }
             })
     }
 
-    fun hentAktørId(ident: String, identGruppe: IdentGruppe, borgerToken: String, callId: String = UUID.randomUUID().toString()): AktørId {
+    fun hentAktørId(
+        ident: String,
+        identGruppe: IdentGruppe,
+        borgerToken: String,
+        callId: String = UUID.randomUUID().toString(),
+    ): AktørId {
         return PdlAktørIdContext(
             pdlService = pdlService,
             ident = ident,
@@ -130,7 +164,12 @@ class TilgangService(
         ).identer.tilAktørId()
     }
 
-    fun hentIdenter(identer: List<String>, identGrupper: List<IdentGruppe>, systemToken: String, callId: String = UUID.randomUUID().toString()): List<HentIdenterBolkResult> {
+    fun hentIdenter(
+        identer: List<String>,
+        identGrupper: List<IdentGruppe>,
+        systemToken: String,
+        callId: String = UUID.randomUUID().toString(),
+    ): List<HentIdenterBolkResult> {
         return PdlIdenterBolkContext(
             pdlService = pdlService,
             identer = identer,
@@ -138,38 +177,6 @@ class TilgangService(
             systemToken = systemToken,
             callId = callId
         ).identerBolkResults
-    }
-
-    /**
-     * Slår opp person fra PDL.
-     *
-     * @param ident: Identifikator til personen som skal slås opp.
-     * @param bearerToken: Sluttbrukers token. Enten Azure OBO, eller tokenX.
-     *
-     * @return TilgangResponsePersonOppslag: Person som ble slått opp.
-     */
-    fun slåOppPerson(ident: String, bearerToken: String, callId: String = UUID.randomUUID().toString(), behandling: Behandling): TilgangResponsePerson {
-        val pdlRelatertPersonOppslagContext = PdlRelatertPersonOppslagContext(
-            pdlService = pdlService,
-            ident = ident,
-            borgerToken = bearerToken,
-            callId = callId,
-            behandling = behandling
-        )
-
-        return evaluate(
-            ctx = pdlRelatertPersonOppslagContext,
-            policy = `NAV-bruker er kjent relasjon`(),
-            block = {
-                when (it.decision) {
-                    PolicyDecision.PERMIT -> TilgangResponsePerson(
-                        pdlRelatertPersonOppslagContext.ident,
-                        pdlRelatertPersonOppslagContext.person,
-                        it
-                    )
-                    else -> TilgangResponsePerson(pdlRelatertPersonOppslagContext.ident, null, it)
-                }
-            })
     }
 }
 

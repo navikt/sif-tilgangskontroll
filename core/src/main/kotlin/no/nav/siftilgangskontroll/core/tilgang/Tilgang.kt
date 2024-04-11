@@ -29,6 +29,11 @@ data class TilgangResponseBarn(
     val policyEvaluation: PolicyEvaluation
 )
 
+data class BarnResponse(
+    val ident: String,
+    val barn: no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person
+)
+
 data class TilgangResponseAktørId(
     val ident: String,
     val aktørId: AktørId? = null,
