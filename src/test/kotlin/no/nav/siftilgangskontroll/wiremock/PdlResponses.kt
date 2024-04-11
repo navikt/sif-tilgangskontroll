@@ -14,6 +14,7 @@ import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as Barn
 
 object PdlResponses {
     fun defaultHentPersonResult(
+        ident: String = "123456789",
         foedsel: Foedsel = Foedsel(foedselsdato = "1990-09-27", foedselsaar = 1990),
         navn: Navn = Navn(
             fornavn = "Ole",
@@ -25,7 +26,7 @@ object PdlResponses {
         adressebeskyttelse: Adressebeskyttelse? = null,
         relatertPersonsIdent: String? = "123"
     ) = Person(
-        folkeregisteridentifikator = listOf(Folkeregisteridentifikator("123456789")),
+        folkeregisteridentifikator = listOf(Folkeregisteridentifikator(ident)),
         foedsel = listOf(foedsel),
         navn = listOf(navn),
         doedsfall = dødsdato?.let { listOf(it) } ?: listOf(),

@@ -2,18 +2,26 @@ package no.nav.siftilgangskontroll.core.tilgang
 
 import no.nav.security.token.support.core.jwt.JwtToken
 import no.nav.siftilgangskontroll.core.behandling.Behandling
-import no.nav.siftilgangskontroll.core.pdl.*
+import no.nav.siftilgangskontroll.core.pdl.AktørId
 import no.nav.siftilgangskontroll.core.pdl.BarnContext
-import no.nav.siftilgangskontroll.policy.spesification.evaluate
+import no.nav.siftilgangskontroll.core.pdl.PdlAktørIdContext
+import no.nav.siftilgangskontroll.core.pdl.PdlIdenterBolkContext
+import no.nav.siftilgangskontroll.core.pdl.PdlPersonContext
+import no.nav.siftilgangskontroll.core.pdl.PdlRelatertPersonOppslagContext
+import no.nav.siftilgangskontroll.core.pdl.PdlService
+import no.nav.siftilgangskontroll.core.pdl.ident
+import no.nav.siftilgangskontroll.core.pdl.tilAktørId
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er i live`
+import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er under myndighetsalder`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er i live`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er myndig`
 import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker har tilgang til barn`
-import no.nav.siftilgangskontroll.core.tilgang.Policies.`Barn er ikke adressebeskyttet`
+import no.nav.siftilgangskontroll.core.tilgang.Policies.`NAV-bruker er kjent relasjon`
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
+import no.nav.siftilgangskontroll.policy.spesification.evaluate
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -130,6 +138,38 @@ class TilgangService(
             systemToken = systemToken,
             callId = callId
         ).identerBolkResults
+    }
+
+    /**
+     * Slår opp person fra PDL.
+     *
+     * @param ident: Identifikator til personen som skal slås opp.
+     * @param bearerToken: Sluttbrukers token. Enten Azure OBO, eller tokenX.
+     *
+     * @return TilgangResponsePersonOppslag: Person som ble slått opp.
+     */
+    fun slåOppPerson(ident: String, bearerToken: String, callId: String = UUID.randomUUID().toString(), behandling: Behandling): TilgangResponsePerson {
+        val pdlRelatertPersonOppslagContext = PdlRelatertPersonOppslagContext(
+            pdlService = pdlService,
+            ident = ident,
+            borgerToken = bearerToken,
+            callId = callId,
+            behandling = behandling
+        )
+
+        return evaluate(
+            ctx = pdlRelatertPersonOppslagContext,
+            policy = `NAV-bruker er kjent relasjon`(),
+            block = {
+                when (it.decision) {
+                    PolicyDecision.PERMIT -> TilgangResponsePerson(
+                        pdlRelatertPersonOppslagContext.ident,
+                        pdlRelatertPersonOppslagContext.person,
+                        it
+                    )
+                    else -> TilgangResponsePerson(pdlRelatertPersonOppslagContext.ident, null, it)
+                }
+            })
     }
 }
 
