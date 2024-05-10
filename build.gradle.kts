@@ -8,13 +8,13 @@ plugins {
     kotlin("plugin.spring") version "1.9.23"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 val kotlinVersion by extra("1.8.21")
 val kotlinXVersion by extra("1.6.4")
-val logstashLogbackEncoderVersion by extra("7.2")
-val tokenSupportVersion by extra("3.2.0")
-val springCloudVersion by extra("4.0.3")
+val logstashLogbackEncoderVersion by extra("7.4")
+val tokenSupportVersion by extra("4.1.4")
+val springCloudVersion by extra("4.1.2")
 val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
 val assertkJvmVersion by extra("0.25")
@@ -51,14 +51,6 @@ allprojects {
 
     afterEvaluate {
         dependencies {
-
-            implementation("org.yaml:snakeyaml") {
-                version {
-                    strictly("2.0")
-                    because("https://github.com/navikt/sif-tilgangskontroll/security/code-scanning/2")
-                }
-            }
-
             // Logging
             implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
             // Kotlin
@@ -78,7 +70,7 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "17"
+            jvmTarget = "21"
         }
     }
 }

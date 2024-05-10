@@ -12,8 +12,8 @@ object TokenClaims {
     const val CLAIM_SUB = "sub"
 }
 
-fun TokenValidationContextHolder.bearerToken(): JwtToken = tokenValidationContext.firstValidToken
-    .orElseThrow { IllegalStateException("Ingen gyldige tokens i Authorization headeren") }
+fun TokenValidationContextHolder.bearerToken(): JwtToken = getTokenValidationContext().firstValidToken ?:
+    throw IllegalStateException("Ingen gyldige tokens i Authorization headeren")
 
 fun JwtToken.personIdent(): String {
     val pid = jwtTokenClaims.getStringClaim(TokenClaims.CLAIM_PID)
