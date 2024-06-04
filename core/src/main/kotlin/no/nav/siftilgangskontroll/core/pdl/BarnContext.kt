@@ -48,7 +48,7 @@ internal data class BarnContext(
 ) {
     val pdlPersonContext = PdlPersonContext(
         pdlService = pdlService,
-        borgerToken = bearerToken.tokenAsString,
+        borgerToken = bearerToken.encodedToken,
         callId = callId,
         behandling = behandling
     )
@@ -57,7 +57,7 @@ internal data class BarnContext(
         pdlService = pdlService,
         barnIdent = barnTilgangForespørsel.barnIdenter,
         callId = callId,
-        systemToken = systemtoken.tokenAsString,
+        systemToken = systemtoken.encodedToken,
         behandling = behandling
     )
 }

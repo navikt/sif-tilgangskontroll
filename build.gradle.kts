@@ -8,7 +8,9 @@ plugins {
     kotlin("plugin.spring") version "2.0.0"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_21
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
 
 val kotlinVersion by extra("1.8.21")
 val kotlinXVersion by extra("1.6.4")
@@ -66,12 +68,11 @@ allprojects {
             implementation("org.json:json:$orgJsonVersion")
         }
     }
+}
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "21"
-        }
+kotlin {
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xjsr305=strict")
     }
 }
 

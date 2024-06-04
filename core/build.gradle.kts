@@ -15,7 +15,9 @@ dependencies {
     implementation("no.nav.security:token-validation-core:$tokenSupportVersion")
 
     //graphql
-    implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion")
+    implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion") {
+        exclude("io.projectreactor.netty", "reactor-netty-http")
+    }
     implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
         exclude("com.expediagroup", "graphql-kotlin-client-serialization")
     }
