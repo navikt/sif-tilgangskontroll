@@ -7,7 +7,7 @@ import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Doedsfall as BarnDoedsfall
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedsel as BarnFoedsel
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedselsdato as BarnFoedsel
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as BarnFolkeregisteridentifikator
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Navn as BarnNavn
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as Barn
@@ -15,19 +15,18 @@ import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Person as Barn
 object PdlResponses {
     fun defaultHentPersonResult(
         ident: String = "123456789",
-        foedsel: Foedsel = Foedsel(foedselsdato = "1990-09-27", foedselsaar = 1990),
+        foedsel: Foedselsdato = Foedselsdato(foedselsdato = "1990-09-27", foedselsaar = 1990),
         navn: Navn = Navn(
             fornavn = "Ole",
             mellomnavn = null,
-            etternavn = "Doffen",
-            forkortetNavn = "Ole Doffen"
+            etternavn = "Doffen"
         ),
         dødsdato: Doedsfall? = null,
         adressebeskyttelse: Adressebeskyttelse? = null,
         relatertPersonsIdent: String? = "123"
     ) = Person(
         folkeregisteridentifikator = listOf(Folkeregisteridentifikator(ident)),
-        foedsel = listOf(foedsel),
+        foedselsdato = listOf(foedsel),
         navn = listOf(navn),
         doedsfall = dødsdato?.let { listOf(it) } ?: listOf(),
         adressebeskyttelse = adressebeskyttelse?.let { listOf(it) } ?: listOf(),
@@ -47,7 +46,6 @@ object PdlResponses {
             fornavn = "Dole",
             mellomnavn = null,
             etternavn = "Doffen",
-            forkortetNavn = "Dole Doffen"
         ),
         dødsdato: BarnDoedsfall? = null,
         adressebeskyttelse: BarnAdressebeskyttelse? = null
@@ -55,7 +53,7 @@ object PdlResponses {
         code = "200",
         person = Barn(
             folkeregisteridentifikator = listOf(folkeregisteridentifikator),
-            foedsel = listOf(fødselsdato),
+            foedselsdato = listOf(fødselsdato),
             navn = listOf(navn),
             doedsfall = dødsdato?.let { listOf(it) } ?: listOf(),
             adressebeskyttelse = adressebeskyttelse?.let { listOf(it) } ?: listOf()

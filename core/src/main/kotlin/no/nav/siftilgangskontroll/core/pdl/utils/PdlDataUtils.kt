@@ -18,8 +18,7 @@ fun List<Navn>.navnSomJsonArray() = JSONArray(
         JSONObject(mapOf(
             "fornavn" to it.fornavn,
             "mellomnavn" to it.mellomnavn,
-            "etternavn" to it.etternavn,
-            "forkortetNavn" to it.forkortetNavn,
+            "etternavn" to it.etternavn
         ))
     }
 )
@@ -60,7 +59,7 @@ fun List<Doedsfall>.dødsfallSomJsonArray() = JSONArray(
     }
 )
 
-fun List<Foedsel>.fødselSomJsonArray() = JSONArray(
+fun List<Foedselsdato>.fødselSomJsonArray() = JSONArray(
     map {
         JSONObject(mapOf(
             "foedselsdato" to it.foedselsdato

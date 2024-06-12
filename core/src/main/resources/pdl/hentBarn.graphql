@@ -8,9 +8,8 @@ query($identer: [ID!]!) {
                 fornavn
                 mellomnavn
                 etternavn
-                forkortetNavn
             },
-            foedsel {
+            foedselsdato {
                 foedselsdato
                 foedselsaar
             }

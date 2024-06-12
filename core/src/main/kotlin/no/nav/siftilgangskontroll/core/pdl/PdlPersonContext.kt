@@ -24,8 +24,8 @@ data class PdlPersonContext(
 
     fun erDød(): Boolean = person.erDød()
     fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon
-    fun fødselsdato(): LocalDate = LocalDate.parse(person.foedsel.first().foedselsdato!!)
-    fun fødselsÅr(): Int = person.foedsel.first().foedselsaar!!
+    fun fødselsdato(): LocalDate = LocalDate.parse(person.foedselsdato.first().foedselsdato!!)
+    fun fødselsÅr(): Int = person.foedselsdato.first().foedselsaar!!
     fun erMyndig(): Boolean {
         val nåværendeÅr = LocalDate.now().year
         val alder = nåværendeÅr - fødselsÅr()
