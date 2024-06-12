@@ -38,7 +38,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
-import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedsel as BarnFødsel
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedselsdato as BarnFødsel
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as BarnFolkeregisteridentifikator
 
 @ExtendWith(SpringExtension::class)
@@ -271,7 +271,7 @@ class TilgangServiceTest {
             val fødselsdato = LocalDate.now().minusYears(17)
             pdlHentPersonResponse(
                 person = defaultHentPersonResult(
-                    foedsel = Foedsel(fødselsdato.toString(), fødselsdato.year)
+                    foedsel = Foedselsdato(fødselsdato.toString(), fødselsdato.year)
                 )
             )
         }

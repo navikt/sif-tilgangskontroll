@@ -69,7 +69,7 @@ internal data class BarnContext(
 fun Person.harAdresseSkjerming(): Boolean = adressebeskyttelse.isNotEmpty()
 
 fun Person.erDød(): Boolean = doedsfall.isNotEmpty()
-fun Person.fødselsdato(): LocalDate = LocalDate.parse(foedsel.first().foedselsdato!!)
+fun Person.fødselsdato(): LocalDate = LocalDate.parse(foedselsdato.first().foedselsdato!!)
 
 fun List<Person>.filtererPåIdent(ident: BarnIdent) =
     first { it.folkeregisteridentifikator.first().identifikasjonsnummer == ident }
