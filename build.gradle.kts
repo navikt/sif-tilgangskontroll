@@ -12,7 +12,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
 
-val kotlinVersion by extra("1.8.21")
+val kotlinVersion by extra("2.1.0")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.4")
 val tokenSupportVersion by extra("4.1.4")
