@@ -36,5 +36,12 @@ enum class Behandling(val behandlingsnummer: String) {
      *
      * @see <a href="https://behandlingskatalog.intern.nav.no/process/purpose/PLEIE_OMSORGS_OG_OPPLAERINGSPENGER/4a1c9324-9c5e-4ddb-ac7f-c55d1dcd9736">NAV Behandlingskatalog</a>
      */
-    OMSORGSPENGER_RAMMEMELDING("B142")
+    OMSORGSPENGER_RAMMEMELDING("B142"),
+
+    /**
+     * Behandlingstype for saksbehandling av søknader om opplæringspenger.
+     *
+     * @see <a href="https://behandlingskatalog.ansatt.nav.no/process/purpose/PLEIE_OMSORGS_OG_OPPLAERINGSPENGER/5c802209-fb14-4bb1-806f-869c1656de03">NAV Behandlingskatalog</a>
+     */
+    OPPLÆRINGSPENGER("B915")
 }
