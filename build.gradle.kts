@@ -31,6 +31,16 @@ configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
     }
+
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "org.springframework" && requested.name == "spring-webflux") {
+                useVersion("6.1.14")
+                because("Patch for path traversal sårbarhet")
+            }
+        }
+    }
+
 }
 
 repositories {
