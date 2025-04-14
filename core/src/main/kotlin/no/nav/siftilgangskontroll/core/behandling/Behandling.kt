@@ -43,5 +43,12 @@ enum class Behandling(val behandlingsnummer: String) {
      *
      * @see <a href="https://behandlingskatalog.ansatt.nav.no/process/purpose/PLEIE_OMSORGS_OG_OPPLAERINGSPENGER/5c802209-fb14-4bb1-806f-869c1656de03">NAV Behandlingskatalog</a>
      */
-    OPPLÆRINGSPENGER("B915")
+    OPPLÆRINGSPENGER("B915"),
+
+    /**
+     * Behandlingstype for å kunne motta og behandle søknad og revurdere ungdomsprogramytelsen.
+     *
+     * @see <a href="https://behandlingskatalog.intern.nav.no/process/purpose/ARBEIDSMARKEDSTILTAK/754a8897-8108-4cfc-8201-52d81dfa5169">NAV Behandlingskatalog</a>
+     */
+    UNGDOMSYTELSEN("B950"),
 }
