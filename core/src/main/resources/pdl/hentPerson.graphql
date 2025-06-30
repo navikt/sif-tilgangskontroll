@@ -10,7 +10,6 @@ query($ident: ID!){
         }
         foedselsdato {
             foedselsdato
-            foedselsaar
         }
         adressebeskyttelse {
             gradering
