@@ -25,10 +25,8 @@ data class PdlPersonContext(
     fun erDød(): Boolean = person.erDød()
     fun relasjoner(): List<ForelderBarnRelasjon> = person.forelderBarnRelasjon
     fun fødselsdato(): LocalDate = LocalDate.parse(person.foedselsdato.first().foedselsdato!!)
-    fun fødselsÅr(): Int = person.foedselsdato.first().foedselsaar!!
     fun erMyndig(): Boolean {
-        val nåværendeÅr = LocalDate.now().year
-        val alder = nåværendeÅr - fødselsÅr()
+        val alder = Period.between(fødselsdato(), LocalDate.now()).years
 
         return alder >= MYNDIG_ALDER
     }
