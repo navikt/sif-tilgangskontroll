@@ -15,7 +15,7 @@ java {
 val kotlinVersion by extra("2.1.0")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.4")
-val tokenSupportVersion by extra("4.1.4")
+val tokenSupportVersion by extra("5.0.30")
 val springCloudVersion by extra("4.1.2")
 val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
@@ -24,8 +24,7 @@ val springMockkVersion by extra("3.1.1")
 val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("33.2.1-jre")
 val orgJsonVersion by extra("20231013")
-val graphQLKotlinVersion by extra("7.0.2")
-val jacksonKotlinModuleVersion by extra("2.15.0")
+val graphQLKotlinVersion by extra("8.8.1")
 
 configurations {
     compileOnly {
@@ -73,7 +72,7 @@ allprojects {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
 
             // Jackson
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonKotlinModuleVersion")
+            implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
             implementation("org.json:json:$orgJsonVersion")
         }

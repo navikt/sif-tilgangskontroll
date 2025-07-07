@@ -1,12 +1,12 @@
 
 plugins {
     kotlin("jvm")
-    id("com.expediagroup.graphql") version "8.8.1"
+    id("com.expediagroup.graphql") version "8.8.0"
 }
 
-val tokenSupportVersion by extra("4.1.4")
+val tokenSupportVersion by extra("5.0.30")
 
-val graphQLKotlinVersion by extra("7.0.2")
+val graphQLKotlinVersion by extra("8.8.1")
 
 dependencies {
     implementation(project(":spesification"))
@@ -18,18 +18,10 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion") {
         exclude("io.projectreactor.netty", "reactor-netty-http")
     }
-    implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion")  {
+    implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion") {
         exclude("com.expediagroup", "graphql-kotlin-client-serialization")
     }
 
-    constraints {
-        implementation("com.fasterxml.jackson.core:jackson-databind") {
-            because("https://github.com/navikt/sif-tilgangskontroll/security/dependabot/2")
-            version {
-                require("2.15.4")
-            }
-        }
-    }
 }
 
 graphql {
