@@ -19,7 +19,6 @@ jobs:
       - uses: actions/checkout@v5
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: nais/alerterator-dev.yml
           VARS: nais/dev-gcp.json
