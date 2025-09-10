@@ -1,8 +1,6 @@
 # SIF Tilgangskontroll
 
-![CI / CD](https://github.com/navikt/sif-tilgangskontroll/workflows/CI%20/%20CD/badge.svg)
-![Alerts](https://github.com/navikt/sif-tilgangskontroll/workflows/Alerts/badge.svg)
-![Vulnerabilities scanning of dependencies](https://github.com/navikt/sif-tilgangskontroll/workflows/Vulnerabilities%20scanning%20of%20dependencies/badge.svg)
+![CI / CD](https://github.com/navikt/sif-tilgangskontroll/workflows/Build/badge.svg)
 
 # Innholdsoversikt
 * [1. Kontekst](#1-kontekst)
