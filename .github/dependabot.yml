@@ -34,8 +34,6 @@ updates:
     directory: "/"
     schedule:
       interval: daily
-    cooldown:
-      default-days: 7
     registries:
       - ghcr
 
