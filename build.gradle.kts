@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `maven-publish`
-    id("org.springframework.boot") version "4.0.1"
+    id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("jvm") version "2.3.0"
     kotlin("plugin.spring") version "2.3.0"
@@ -11,7 +11,7 @@ plugins {
 val kotlinVersion by extra("2.1.0")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.4")
-val tokenSupportVersion by extra("5.0.30")
+val tokenSupportVersion by extra("6.0.0")
 val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
 val assertkJvmVersion by extra("0.25")
@@ -20,7 +20,7 @@ val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("33.2.1-jre")
 val orgJsonVersion by extra("20231013")
 val graphQLKotlinVersion by extra("8.8.1")
-val wiremockVersion by extra("3.10.0")
+val wiremockVersion by extra("4.0.9")
 
 configurations {
     compileOnly {
@@ -140,8 +140,6 @@ dependencies {
 
     // WireMock
     testImplementation("org.wiremock.integrations:wiremock-spring-boot:$wiremockVersion")
-    testImplementation("org.wiremock:wiremock-jetty12:3.13.2")
-    testImplementation("org.eclipse.jetty.ee10:jetty-ee10-bom:12.1.0")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -152,7 +150,7 @@ dependencies {
     // Diverse
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.google.guava:guava:$guavaVersion")
-    testImplementation("org.awaitility:awaitility-kotlin:$awailitilityKotlinVersion")
+    testImplementation("org.awaitility:awaitility-kotlin")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:$assertkJvmVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
