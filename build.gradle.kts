@@ -33,7 +33,7 @@ repositories {
         name = "sif-tilgangskontroll"
         url = uri("https://maven.pkg.github.com/navikt/sif-tilgangskontroll")
         credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+            username = project.findProperty("gpr.user") as String? ?: "sif-tilgangskontroll"
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }

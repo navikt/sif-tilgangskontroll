@@ -27,7 +27,7 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      readertoken: true
+      readertoken: false
       buildcommand: './gradlew check'
       javaversion: 21
 
@@ -40,7 +40,7 @@ jobs:
       security-events: write
     secrets: inherit
     with:
-      readertoken: true
+      readertoken: false
       package-command: './gradlew clean build -x test'
       branch: master
       javaversion: 21
@@ -54,7 +54,7 @@ jobs:
     secrets: inherit
     with:
       team: dusseldorf
-      readertoken: true
+      readertoken: false
       buildcommand: '--configuration-cache build -x test'
       javaversion: 21
 
