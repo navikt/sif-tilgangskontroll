@@ -32,10 +32,12 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.wiremock.spring.ConfigureWireMock
+import org.wiremock.spring.EnableWireMock
+import org.wiremock.spring.InjectWireMock
 import java.time.LocalDate
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedselsdato as BarnFødsel
@@ -46,7 +48,7 @@ import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifika
 @DirtiesContext
 @ActiveProfiles("test")
 @EnableMockOAuth2Server // Tilgjengliggjør en oicd-provider for test.
-@AutoConfigureWireMock
+@EnableWireMock(ConfigureWireMock(name = "pdl-api", portProperties = ["wiremock.server.port"]))
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
 class TilgangServiceTest {
 
@@ -57,8 +59,7 @@ class TilgangServiceTest {
     @Autowired
     lateinit var mockOAuth2Server: MockOAuth2Server
 
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
+    @InjectWireMock("pdl-api")
     private lateinit var wireMockServer: WireMockServer
 
     private lateinit var jwtToken: String

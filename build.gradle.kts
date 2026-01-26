@@ -1,22 +1,17 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `maven-publish`
-    id("org.springframework.boot") version "3.5.7"
+    id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("jvm") version "2.2.21"
-    kotlin("plugin.spring") version "2.2.21"
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    kotlin("jvm") version "2.3.0"
+    kotlin("plugin.spring") version "2.3.0"
 }
 
 val kotlinVersion by extra("2.1.0")
 val kotlinXVersion by extra("1.6.4")
 val logstashLogbackEncoderVersion by extra("7.4")
-val tokenSupportVersion by extra("5.0.30")
-val springCloudVersion by extra("4.1.2")
+val tokenSupportVersion by extra("6.0.0")
 val retryVersion by extra("2.0.0")
 val awailitilityKotlinVersion by extra("4.2.0")
 val assertkJvmVersion by extra("0.25")
@@ -25,21 +20,12 @@ val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("33.2.1-jre")
 val orgJsonVersion by extra("20231013")
 val graphQLKotlinVersion by extra("8.8.1")
+val wiremockVersion by extra("4.0.9")
 
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
     }
-
-    configurations.all {
-        resolutionStrategy.eachDependency {
-            if (requested.group == "org.springframework" && requested.name == "spring-webflux") {
-                useVersion("6.1.14")
-                because("Patch for path traversal sårbarhet")
-            }
-        }
-    }
-
 }
 
 repositories {
@@ -47,7 +33,7 @@ repositories {
         name = "sif-tilgangskontroll"
         url = uri("https://maven.pkg.github.com/navikt/sif-tilgangskontroll")
         credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+            username = project.findProperty("gpr.user") as String? ?: "sif-tilgangskontroll"
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
@@ -58,6 +44,21 @@ allprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_21)
+            }
+        }
+    }
+
+    plugins.withId("java") {
+        configure<JavaPluginExtension> {
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+        }
     }
 
     afterEvaluate {
@@ -125,6 +126,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-jackson2")
     implementation("org.springframework.retry:spring-retry:$retryVersion")
     implementation("org.springframework:spring-aspects")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
@@ -136,9 +138,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
 
-    // Spring Cloud
-    // https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-contract-stub-runner
-    testImplementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner:$springCloudVersion")
+    // WireMock
+    testImplementation("org.wiremock.integrations:wiremock-spring-boot:$wiremockVersion")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
@@ -149,7 +150,7 @@ dependencies {
     // Diverse
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.google.guava:guava:$guavaVersion")
-    testImplementation("org.awaitility:awaitility-kotlin:$awailitilityKotlinVersion")
+    testImplementation("org.awaitility:awaitility-kotlin")
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:$assertkJvmVersion")
     testImplementation("com.ninja-squad:springmockk:$springMockkVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
