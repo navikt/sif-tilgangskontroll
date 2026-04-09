@@ -46,7 +46,7 @@ Push/merge til master branche vil teste, bygge og deploye til produksjonsmiljø 
 # 9. Utviklingsmiljø
 ## Forutsetninger
 * docker
-* Java 17
+* Java 25
 * Kubectl
 
 ## Bygge Prosjekt
