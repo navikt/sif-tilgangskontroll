@@ -19,7 +19,7 @@ val springMockkVersion by extra("3.1.1")
 val mockkVersion by extra("1.13.2")
 val guavaVersion by extra("33.2.1-jre")
 val orgJsonVersion by extra("20231013")
-val graphQLKotlinVersion by extra("8.8.1")
+val graphQLKotlinVersion by extra("10.2.2")
 val wiremockVersion by extra("4.0.9")
 
 configurations {
@@ -63,17 +63,12 @@ allprojects {
 
     afterEvaluate {
         dependencies {
-            // Logging
-            implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
             // Kotlin
             implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
             implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
-
-            // Jackson
-            implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
             implementation("org.json:json:$orgJsonVersion")
         }
@@ -126,7 +121,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-jackson2")
+    implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.springframework.retry:spring-retry:$retryVersion")
     implementation("org.springframework:spring-aspects")
     runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
@@ -140,6 +135,9 @@ dependencies {
 
     // WireMock
     testImplementation("org.wiremock.integrations:wiremock-spring-boot:$wiremockVersion")
+
+    // Logging
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
