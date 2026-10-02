@@ -8,16 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-      contents: write
+      contents: read
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout latest code
+      - name: Checkout release tag
         uses: actions/checkout@v7
-        with:
-          ref: master
       - name: Set up JDK
         uses: actions/setup-java@v5.7.0
         with:
-          java-version: 21
+          java-version: 25
           distribution: corretto
           cache: gradle
       - name: Build JAR
@@ -26,7 +26,6 @@ jobs:
         env:
           NEW_VERSION: ${{ github.event.release.tag_name }}
           GITHUB_USERNAME: x-access-token
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo ${NEW_VERSION}
           ./gradlew -Pversion="${NEW_VERSION}" publish
