@@ -1,12 +1,12 @@
 
 plugins {
     kotlin("jvm")
-    id("com.expediagroup.graphql") version "10.1.2"
+    id("com.expediagroup.graphql") version "10.2.2"
 }
 
 val tokenSupportVersion by extra("5.0.30")
 
-val graphQLKotlinVersion by extra("8.8.1")
+val graphQLKotlinVersion by extra("10.2.2")
 
 dependencies {
     implementation(project(":spesification"))
@@ -18,10 +18,6 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion") {
         exclude("io.projectreactor.netty", "reactor-netty-http")
     }
-    implementation("com.expediagroup:graphql-kotlin-ktor-client:$graphQLKotlinVersion") {
-        exclude("com.expediagroup", "graphql-kotlin-client-serialization")
-    }
-
 }
 
 graphql {

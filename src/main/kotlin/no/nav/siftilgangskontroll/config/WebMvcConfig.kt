@@ -1,15 +1,15 @@
 package no.nav.siftilgangskontroll.config
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.PropertyNamingStrategies
-import com.fasterxml.jackson.databind.SerializationFeature
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.jackson2.autoconfigure.Jackson2ObjectMapperBuilderCustomizer
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.PropertyNamingStrategies
+import tools.jackson.databind.cfg.DateTimeFeature
 
 @Configuration
 class WebMvcConfig() : WebMvcConfigurer {
@@ -35,14 +35,14 @@ class WebMvcConfig() : WebMvcConfigurer {
     }
 
     @Bean
-    fun jacksonBuilderCustomizer(): Jackson2ObjectMapperBuilderCustomizer {
+    fun jacksonBuilderCustomizer(): JsonMapperBuilderCustomizer {
         log.info("-------> Customizing builder")
-        return Jackson2ObjectMapperBuilderCustomizer { builder ->
-            builder.featuresToDisable(
-                SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS
+        return JsonMapperBuilderCustomizer { builder ->
+            builder.disable(
+                DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS,
+                DateTimeFeature.WRITE_DURATIONS_AS_TIMESTAMPS
             )
+            builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             builder.propertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
         }
     }
