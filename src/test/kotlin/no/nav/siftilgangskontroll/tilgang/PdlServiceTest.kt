@@ -3,6 +3,7 @@ package no.nav.siftilgangskontroll.tilgang
 import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import com.github.tomakehurst.wiremock.WireMockServer
@@ -37,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.json.JSONObject
 import org.wiremock.spring.ConfigureWireMock
 import org.wiremock.spring.EnableWireMock
 import org.wiremock.spring.InjectWireMock
@@ -118,6 +120,30 @@ class PdlServiceTest {
     }
 
     @Test
+    fun `hentPerson for B566 sender ikke forelderBarnRelasjon i spørringen`() {
+        val callId = UUID.randomUUID().toString()
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            JSONObject(pdlHentPersonResponse(defaultHentPersonResult(ident = BRUKER_IDENT)))
+                .apply { getJSONObject("data").getJSONObject("hentPerson").remove("forelderBarnRelasjon") }
+                .toString()
+        }
+
+        val respons = tilgangService.hentPerson(bearerToken = jwtToken, callId = callId, behandling = Behandling.PLEIEPENGER_I_LIVETS_SLUTTFASE)
+
+        verifiserPdlKall(
+            operasjon = PdlOperasjon.HENT_PERSON,
+            callId = callId,
+            behandlingsnummer = Behandling.PLEIEPENGER_I_LIVETS_SLUTTFASE.behandlingsnummer,
+            variabel = "\$.variables.ident" to BRUKER_IDENT
+        )
+        wireMockServer.verify(
+            0,
+            WireMock.postRequestedFor(WireMock.anyUrl()).withRequestBody(WireMock.containing("forelderBarnRelasjon"))
+        )
+        assertThat(respons.person!!.forelderBarnRelasjon).isEmpty()
+    }
+
+    @Test
     fun `slåOppBarn sender token, callId og behandlingsnummer til PDL`() {
         val callId = UUID.randomUUID().toString()
         wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
@@ -150,7 +176,7 @@ class PdlServiceTest {
             ),
             HentIdenterBolkResult(ident = BARN_IDENT, identer = null, code = "not_found")
         )
-        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER_BOLK, medbehandlingsnummer = false) {
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_IDENTER_BOLK) {
             pdlHentIdenterBolkResponse(forventet)
         }
 
@@ -158,14 +184,15 @@ class PdlServiceTest {
             identer = listOf(BRUKER_IDENT, BARN_IDENT),
             identGrupper = listOf(IdentGruppe.AKTORID),
             systemToken = jwtToken,
-            callId = callId
+            callId = callId,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
         )
 
         assertThat(respons).isEqualTo(forventet)
         verifiserPdlKall(
             operasjon = PdlOperasjon.HENT_IDENTER_BOLK,
             callId = callId,
-            behandlingsnummer = null,
+            behandlingsnummer = Behandling.PLEIEPENGER_SYKT_BARN.behandlingsnummer,
             variabel = "$.variables.identer[1]" to BARN_IDENT
         )
     }
@@ -191,7 +218,7 @@ class PdlServiceTest {
                 "Feil ved henting av person-bolk."
             )
             PdlOperasjon.HENT_IDENTER -> Pair(
-                { tilgangService.hentAktørId(ident = BRUKER_IDENT, identGruppe = IdentGruppe.AKTORID, borgerToken = jwtToken) },
+                { tilgangService.hentAktørId(ident = BRUKER_IDENT, identGruppe = IdentGruppe.AKTORID, borgerToken = jwtToken, behandling = Behandling.PLEIEPENGER_SYKT_BARN) },
                 "Feil ved henting av ident."
             )
             PdlOperasjon.HENT_IDENTER_BOLK -> Pair(
@@ -199,7 +226,8 @@ class PdlServiceTest {
                     tilgangService.hentIdenter(
                         identer = listOf(BRUKER_IDENT),
                         identGrupper = listOf(IdentGruppe.AKTORID),
-                        systemToken = jwtToken
+                        systemToken = jwtToken,
+                        behandling = Behandling.PLEIEPENGER_SYKT_BARN
                     )
                 },
                 "Feil ved henting av identer."

@@ -302,7 +302,7 @@ class TilgangServiceTest {
         }
 
         val aktørId =
-            tilgangService.hentAktørId(ident = "123", identGruppe = IdentGruppe.AKTORID, borgerToken = jwtToken)
+            tilgangService.hentAktørId(ident = "123", identGruppe = IdentGruppe.AKTORID, borgerToken = jwtToken, behandling = Behandling.PLEIEPENGER_SYKT_BARN)
 
         assertThat(aktørId).isNotNull()
         assertThat(aktørId.value).isEqualTo(forventetAktørId)
