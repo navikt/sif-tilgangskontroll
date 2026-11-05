@@ -6,6 +6,11 @@ import no.nav.siftilgangskontroll.pdl.generated.*
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 import no.nav.siftilgangskontroll.pdl.generated.hentidenterbolk.HentIdenterBolkResult
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.Adressebeskyttelse
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.Doedsfall
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.Foedselsdato
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.Folkeregisteridentifikator
+import no.nav.siftilgangskontroll.pdl.generated.hentperson.Navn
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.Person
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -21,7 +26,18 @@ class PdlService(
         private const val BEHANLINGSNUMMER = "Behandlingsnummer"
     }
 
-    internal suspend fun person(ident: String, borgerToken: String, callId: String, behandling: Behandling): Person {
+    internal suspend fun person(ident: String, borgerToken: String, callId: String, behandling: Behandling): Person =
+        when (behandling) {
+            Behandling.PLEIEPENGER_SYKT_BARN,
+            Behandling.OMSORGSPENGERUTBETALING,
+            Behandling.OMSORGSPENGER_RAMMEMELDING,
+            Behandling.OPPLÆRINGSPENGER,
+            Behandling.UNGDOMSYTELSEN -> personMedRelasjoner(ident, borgerToken, callId, behandling)
+
+            Behandling.PLEIEPENGER_I_LIVETS_SLUTTFASE -> personUtenRelasjoner(ident, borgerToken, callId, behandling)
+        }
+
+    private suspend fun personMedRelasjoner(ident: String, borgerToken: String, callId: String, behandling: Behandling): Person {
         val result = graphQLClient.execute(HentPerson(HentPerson.Variables(ident))) {
             header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
             header(NAV_CALL_ID, callId)
@@ -40,6 +56,31 @@ class PdlService(
                 throw IllegalStateException("Feil ved henting av person.")
             }
         }
+    }
+
+    private suspend fun personUtenRelasjoner(ident: String, borgerToken: String, callId: String, behandling: Behandling): Person {
+        val result = graphQLClient.execute(HentPersonUtenRelasjoner(HentPersonUtenRelasjoner.Variables(ident))) {
+            header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
+            header(NAV_CALL_ID, callId)
+            header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
+        }
+
+        if (!result.extensions.isNullOrEmpty()) logger.info("PDL response extensions: ${result.extensions}")
+
+        if (!result.errors.isNullOrEmpty()) {
+            logger.error("Feil ved henting av person. Årsak: {}", result.errors)
+            throw IllegalStateException("Feil ved henting av person.")
+        }
+        val person = result.data?.hentPerson ?: throw IllegalStateException("Feil ved henting av person.")
+
+        return Person(
+            folkeregisteridentifikator = person.folkeregisteridentifikator.map { Folkeregisteridentifikator(it.identifikasjonsnummer) },
+            navn = person.navn.map { Navn(it.fornavn, it.mellomnavn, it.etternavn) },
+            foedselsdato = person.foedselsdato.map { Foedselsdato(it.foedselsdato) },
+            adressebeskyttelse = person.adressebeskyttelse.map { Adressebeskyttelse(it.gradering) },
+            doedsfall = person.doedsfall.map { Doedsfall(it.doedsdato) },
+            forelderBarnRelasjon = emptyList(),
+        )
     }
 
     internal suspend fun barn(
@@ -72,11 +113,13 @@ class PdlService(
         ident: String,
         borgerToken: String,
         callId: String = UUID.randomUUID().toString(),
-        identGruppe: IdentGruppe
+        identGruppe: IdentGruppe,
+        behandling: Behandling,
     ): List<IdentInformasjon> {
         val result = graphQLClient.execute(HentIdent(HentIdent.Variables(ident, listOf(identGruppe)))) {
             header(HttpHeaders.AUTHORIZATION, "Bearer $borgerToken")
             header(NAV_CALL_ID, callId)
+            header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
         }
 
         if (!result.extensions.isNullOrEmpty()) logger.info("PDL response extensions: ${result.extensions}")
@@ -97,7 +140,8 @@ class PdlService(
         identer: List<String>,
         identGrupper: List<IdentGruppe>,
         systemToken: String,
-        callId: String = UUID.randomUUID().toString()
+        callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling,
     ): List<HentIdenterBolkResult> {
 
         val result = graphQLClient.execute(
@@ -105,6 +149,7 @@ class PdlService(
         ) {
             header(HttpHeaders.AUTHORIZATION, "Bearer $systemToken")
             header(NAV_CALL_ID, callId)
+            header(BEHANLINGSNUMMER, behandling.behandlingsnummer)
         }
 
         if (!result.extensions.isNullOrEmpty()) logger.info("PDL response extensions: ${result.extensions}")

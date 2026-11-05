@@ -1,0 +1,21 @@
+query($ident: ID!){
+    hentPerson(ident: $ident) {
+        folkeregisteridentifikator {
+            identifikasjonsnummer
+        }
+        navn {
+            fornavn
+            mellomnavn
+            etternavn
+        }
+        foedselsdato {
+            foedselsdato
+        }
+        adressebeskyttelse {
+            gradering
+        }
+        doedsfall {
+            doedsdato
+        }
+    }
+}

@@ -154,13 +154,15 @@ class TilgangService(
         identGruppe: IdentGruppe,
         borgerToken: String,
         callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling,
     ): AktørId {
         return PdlAktørIdContext(
             pdlService = pdlService,
             ident = ident,
             identGruppe = identGruppe,
             borgerToken = borgerToken,
-            callId = callId
+            callId = callId,
+            behandling = behandling
         ).identer.tilAktørId()
     }
 
@@ -169,13 +171,15 @@ class TilgangService(
         identGrupper: List<IdentGruppe>,
         systemToken: String,
         callId: String = UUID.randomUUID().toString(),
+        behandling: Behandling,
     ): List<HentIdenterBolkResult> {
         return PdlIdenterBolkContext(
             pdlService = pdlService,
             identer = identer,
             identGrupper = identGrupper,
             systemToken = systemToken,
-            callId = callId
+            callId = callId,
+            behandling = behandling
         ).identerBolkResults
     }
 }

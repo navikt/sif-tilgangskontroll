@@ -1,6 +1,7 @@
 package no.nav.siftilgangskontroll.core.pdl
 
 import kotlinx.coroutines.runBlocking
+import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentident.IdentInformasjon
 
@@ -9,13 +10,15 @@ data class PdlAktørIdContext(
     private val ident: String,
     private val identGruppe: IdentGruppe,
     private val callId: String,
-    val borgerToken: String
+    private val behandling: Behandling,
+    val borgerToken: String,
 ) {
     val identer: List<IdentInformasjon> = runBlocking { pdlService.hentIdent(
         ident,
         borgerToken,
         callId,
-        identGruppe
+        identGruppe,
+        behandling
     ) }
 }
 

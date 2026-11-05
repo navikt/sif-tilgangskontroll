@@ -39,7 +39,7 @@ class TilgangsController(
     @ResponseStatus(OK)
     fun hentTilgangTilPerson(): ResponseEntity<TilgangResponsePerson> {
         val personOppslagRespons = tilgangService.hentPerson(
-            behandling = Behandling.PLEIEPENGER_SYKT_BARN,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN, // Endepunktene tar ikke inn ytelse
             bearerToken = pdlAuthService.borgerToken(),
             callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
         )
@@ -56,7 +56,7 @@ class TilgangsController(
             barnTilgangForespørsel = barnTilgangForespørsel,
             bearerToken = pdlAuthService.borgerToken(),
             systemToken = pdlAuthService.systemToken(),
-            behandling = Behandling.PLEIEPENGER_SYKT_BARN,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN, // Endepunktene tar ikke inn ytelse
             callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
         )
         logger.info("Hentet tilgang: {}", barnOppslagRespons)
@@ -72,6 +72,7 @@ class TilgangsController(
             ident = aktørIdTilgangForespørsel.ident,
             identGruppe = IdentGruppe.AKTORID,
             borgerToken = pdlAuthService.borgerToken(),
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN, // Endepunktene tar ikke inn ytelse
             callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
         )
         logger.info("Hentet aktørId: {}", aktørId)
@@ -87,6 +88,7 @@ class TilgangsController(
             identer = hentIdenterForespørsel.identer,
             identGrupper = hentIdenterForespørsel.identGrupper,
             systemToken = pdlAuthService.systemToken(),
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN, // Endepunktene tar ikke inn ytelse
             callId = "sif-tilgangskontroll-${UUID.randomUUID()}"
         )
         logger.info("Hentet aktørId: {}", identerBolkResults)
