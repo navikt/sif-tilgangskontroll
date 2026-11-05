@@ -3,6 +3,7 @@ package no.nav.siftilgangskontroll.tilgang
 import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import com.github.tomakehurst.wiremock.WireMockServer
