@@ -112,9 +112,6 @@ dependencies {
     implementation("no.nav.sif.tilgangskontroll:core:1-25a6045")*/
 
     // NAV
-    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
-    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
-
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
 
     // Spring Boot

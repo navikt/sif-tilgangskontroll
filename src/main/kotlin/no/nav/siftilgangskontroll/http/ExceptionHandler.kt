@@ -1,8 +1,5 @@
 package no.nav.siftilgangskontroll.http
 
-import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
-import no.nav.security.token.support.core.exceptions.JwtTokenValidatorException
-import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import no.nav.siftilgangskontroll.util.ServletUtils.respondProblemDetails
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,55 +29,6 @@ class ExceptionHandler : ResponseEntityExceptionHandler() {
             detail = exception.message ?: ""
         )
         log.error("{}", problemDetails)
-        return problemDetails
-    }
-
-
-    @ExceptionHandler(value = [JwtTokenUnauthorizedException::class])
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    fun håndtereTokenUnauthorizedException(
-        exception: JwtTokenUnauthorizedException,
-        request: ServletWebRequest,
-    ): ProblemDetail {
-        val problemDetails = request.respondProblemDetails(
-            status = HttpStatus.UNAUTHORIZED,
-            title = "Ikke autentisert",
-            type = URI("/problem-details/uautentisert-forespørsel"),
-            detail = exception.message ?: ""
-        )
-        log.debug("{}", problemDetails)
-        return problemDetails
-    }
-
-    @ExceptionHandler(JwtTokenValidatorException::class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    fun håndtereTokenUnauthenticatedException(
-        exception: JwtTokenValidatorException,
-        request: ServletWebRequest,
-    ): ProblemDetail {
-        val problemDetails = request.respondProblemDetails(
-            status = HttpStatus.FORBIDDEN,
-            title = "Ikke uautorisert",
-            type = URI("/problem-details/uautorisert-forespørsel"),
-            detail = exception.message ?: ""
-        )
-        log.debug("{}", problemDetails)
-        return problemDetails
-    }
-
-    @ExceptionHandler(JwtTokenMissingException::class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    fun håndtereJwtTokenMissingException(
-        exception: JwtTokenMissingException,
-        request: ServletWebRequest,
-    ): ProblemDetail {
-        val problemDetails = request.respondProblemDetails(
-            status = HttpStatus.UNAUTHORIZED,
-            title = "Ingen token funnet.",
-            type = URI("/problem-details/mangler-token"),
-            detail = exception.message ?: ""
-        )
-        log.debug("{}", problemDetails)
         return problemDetails
     }
 }

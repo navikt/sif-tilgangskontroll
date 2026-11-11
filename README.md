@@ -20,7 +20,7 @@ Utføre tilgangskontroll av sluttbrukere og saksbehandlere for tjenester i sykdo
 # 2. Funksjonelle Krav
 Denne tjenesten understøtter behovet for utføring av tilgangskontroll av sluttbrukere og saksbehandlere for team sif.
 Tjenesten utfører tilgangskontroll basert på visse regelsett avhengig om bruker er borger eller saksbehandler.
-Tjenesten eksponerer api for at andre tjenester kan utføre tilgangskontroll på vegne av bruker.
+Tilgangskontrollen publiseres som bibliotekene `core` og `spesification`. Andre tjenester bruker dem til å utføre tilgangskontroll på vegne av bruker. Repoet har ingen API-endepunkter.
 
 # 3. Begrensninger
 N/A
@@ -62,9 +62,6 @@ For å kjøre kode, kjør:
 ```shell script
 ./gradlew bootRun
 ```
-
-### Henting av data via api-endepunktene
-TODO: Forklar henting av gyldig token for bruk av apiet.
 
 # 10. Drift og støtte
 ## Logging
