@@ -33,6 +33,11 @@ allprojects {
 }
 
 subprojects {
+    // Lockfilene gjør at Trivy kan skanne Gradle-avhengighetene.
+    dependencyLocking {
+        lockAllConfigurations()
+    }
+
     apply(plugin = "maven-publish")
     configure<PublishingExtension> {
         repositories {

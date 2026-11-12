@@ -47,7 +47,7 @@ implementation("no.nav.sif.tilgangskontroll:core:<versjon>")
 implementation("no.nav.sif.tilgangskontroll:spesification:<versjon>")
 ```
 
-Workflowen [Build](.github/workflows/build-and-deploy.yml) kjører testene og CodeQL ved hver push. Repoet bygger ikke image og deployer ingenting.
+Workflowen [Build](.github/workflows/build-and-deploy.yml) kjører testene, CodeQL og Trivy ved hver push. Trivy skanner `gradle.lockfile` i hver modul og laster opp sårbarheter med alvor HIGH og CRITICAL til GitHub Security. Repoet bygger ikke image og deployer ingenting.
 
 # 9. Utviklingsmiljø
 ## Forutsetninger
@@ -58,6 +58,13 @@ For å bygge kode og kjøre testene, kjør:
 
 ```shell script
 ./gradlew clean build
+```
+
+## Oppdatere lockfilene
+Avhengighetene er låst i `core/gradle.lockfile` og `spesification/gradle.lockfile`. Dependabot oppdaterer dem selv. Endrer du en avhengighet for hånd, oppdaterer du lockfilene med:
+
+```shell script
+./gradlew :core:dependencies :spesification:dependencies --write-locks
 ```
 
 # 10. Henvendelser
