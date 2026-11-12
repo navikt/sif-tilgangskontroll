@@ -6,13 +6,13 @@
 * [1. Kontekst](#1-kontekst)
 * [2. Funksjonelle Krav](#2-funksjonelle-krav)
 * [3. Begrensninger](#3-begrensninger)
-* [4. Programvarearkitektur](#5-programvarearkitektur)
-* [5. Kode](#6-kode)
-* [6. Data](#7-data)
-* [7. Infrastrukturarkitektur](#8-infrastrukturarkitektur)
-* [8. Distribusjon av tjenesten (deployment)](#9-distribusjon-av-tjenesten-deployment)
-* [9. Utviklingsmiljø](#10-utviklingsmilj)
-* [10. Drift og støtte](#11-drift-og-sttte)
+* [4. Programvarearkitektur](#4-programvarearkitektur)
+* [5. Kode](#5-kode)
+* [6. Data](#6-data)
+* [7. Infrastrukturarkitektur](#7-infrastrukturarkitektur)
+* [8. Publisering](#8-publisering)
+* [9. Utviklingsmiljø](#9-utviklingsmiljø)
+* [10. Henvendelser](#10-henvendelser)
 
 # 1. Kontekst
 Utføre tilgangskontroll av sluttbrukere og saksbehandlere for tjenester i sykdom-i-familien (SIF).
@@ -37,63 +37,30 @@ N/A
 # 7. Infrastrukturarkitektur
 N/A
 
-# 8. Distribusjon av tjenesten (deployment)
-Distribusjon av tjenesten er gjort med bruk av Github Actions.
-[SIF Tilgangskontroll API CI / CD](https://github.com/navikt/sif-tilgangskontroll/actions)
+# 8. Publisering
+Workflowen [Publish release](.github/workflows/publish.yml) publiserer bibliotekene `core` og `spesification` til GitHub Packages når noen publiserer en release i GitHub. Taggen på releasen blir versjonsnummeret.
 
-Push/merge til master branche vil teste, bygge og deploye til produksjonsmiljø og testmiljø.
+Konsumentene legger til `https://maven.pkg.github.com/navikt/sif-tilgangskontroll` som Maven-repository og henter bibliotekene slik:
+
+```kotlin
+implementation("no.nav.sif.tilgangskontroll:core:<versjon>")
+implementation("no.nav.sif.tilgangskontroll:spesification:<versjon>")
+```
+
+Workflowen [Build](.github/workflows/build-and-deploy.yml) kjører testene og CodeQL ved hver push. Repoet bygger ikke image og deployer ingenting.
 
 # 9. Utviklingsmiljø
 ## Forutsetninger
-* docker
 * Java 25
-* Kubectl
 
 ## Bygge Prosjekt
-For å bygge kode, kjør:
+For å bygge kode og kjøre testene, kjør:
 
 ```shell script
 ./gradlew clean build
 ```
 
-## Kjøre Prosjekt
-For å kjøre kode, kjør:
-
-```shell script
-./gradlew bootRun
-```
-
-# 10. Drift og støtte
-## Logging
-Loggene til tjenesten kan leses på to måter:
-
-### Kibana
-TODO: Legg til lenker for logg i kibana.
-
-### Kubectl
-For dev-gcp:
-```shell script
-kubectl config use-context dev-gcp
-kubectl get pods -n dusseldorf | grep sif-tilgangskontroll
-kubectl logs -f sif-tilgangskontroll-<POD-ID> --namespace dusseldorf -c sif-tilgangskontroll
-```
-
-For prod-gcp:
-```shell script
-kubectl config use-context prod-gcp
-kubectl get pods -n dusseldorf | grep sif-tilgangskontroll
-kubectl logs -f sif-tilgangskontroll-<POD-ID> --namespace dusseldorf -c sif-tilgangskontroll
-```
-
-## Alarmer
-Vi bruker [nais-alerts](https://doc.nais.io/observability/alerts) for å sette opp alarmer. Disse finner man konfigurert i [nais/alerterator-prod.yml](nais/alerterator-prod.yml).
-
-## Metrics
-N/A
-
-## Henvendelser
-Spørsmål koden eller prosjekttet kan rettes til team brukerdialog på:
+# 10. Henvendelser
+Still spørsmål om koden eller prosjektet til team brukerdialog på Slack:
 * [\#sif-brukerdialog](https://nav-it.slack.com/archives/CQ7QKSHJR)
 * [\#sif-innsynsplattform](https://nav-it.slack.com/archives/C013ZJTKUNB)
-
-

@@ -5,9 +5,6 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import com.github.tomakehurst.wiremock.WireMockServer
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.core.pdl.utils.PdlOperasjon
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentIdenterResponse
@@ -15,12 +12,12 @@ import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonBolkResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonResponse
 import no.nav.siftilgangskontroll.core.tilgang.BarnResponse
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
-import no.nav.siftilgangskontroll.core.tilgang.TilgangService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering.STRENGT_FORTROLIG
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
+import no.nav.siftilgangskontroll.utils.PdlIntegrasjonstest
 import no.nav.siftilgangskontroll.utils.hentToken
 import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentIdenterResult
 import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentPersonBolkResult
@@ -29,38 +26,13 @@ import no.nav.siftilgangskontroll.wiremock.stubPdlRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.wiremock.spring.ConfigureWireMock
-import org.wiremock.spring.EnableWireMock
-import org.wiremock.spring.InjectWireMock
 import java.time.LocalDate
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedselsdato as BarnFødsel
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as BarnFolkeregisteridentifikator
 
-@ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DirtiesContext
-@ActiveProfiles("test")
-@EnableMockOAuth2Server // Tilgjengliggjør en oicd-provider for test.
-@EnableWireMock(ConfigureWireMock(name = "pdl-api", portProperties = ["wiremock.server.port"]))
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
-class TilgangServiceTest {
-
-    @Autowired
-    private lateinit var tilgangService: TilgangService
-
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    lateinit var mockOAuth2Server: MockOAuth2Server
-
-    @InjectWireMock("pdl-api")
-    private lateinit var wireMockServer: WireMockServer
+class TilgangServiceTest : PdlIntegrasjonstest() {
 
     private lateinit var jwtToken: String
 
