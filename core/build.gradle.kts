@@ -4,6 +4,10 @@ plugins {
     id("com.expediagroup.graphql") version "10.2.2"
 }
 
+val kotlinVersion: String by rootProject.extra
+val kotlinXVersion: String by rootProject.extra
+val orgJsonVersion: String by rootProject.extra
+
 val tokenSupportVersion by extra("5.0.30")
 
 val graphQLKotlinVersion by extra("10.2.2")
@@ -22,6 +26,14 @@ dependencies {
     implementation("com.expediagroup:graphql-kotlin-spring-client:$graphQLKotlinVersion") {
         exclude("io.projectreactor.netty", "reactor-netty-http")
     }
+
+    // Kotlin
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXVersion")
+
+    implementation("org.json:json:$orgJsonVersion")
 
     // Test
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))

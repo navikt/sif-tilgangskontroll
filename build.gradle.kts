@@ -33,19 +33,6 @@ allprojects {
 }
 
 subprojects {
-    afterEvaluate {
-        dependencies {
-            // Kotlin
-            "implementation"("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-            "implementation"("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-            "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
-            "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinXVersion")
-            "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinXVersion")
-
-            "implementation"("org.json:json:$orgJsonVersion")
-        }
-    }
-
     apply(plugin = "maven-publish")
     configure<PublishingExtension> {
         repositories {
