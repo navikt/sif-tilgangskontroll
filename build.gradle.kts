@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `maven-publish`
-    kotlin("jvm") version "2.4.10" apply false
+    kotlin("jvm") version "2.4.21" apply false
 }
 
 val kotlinVersion by extra("2.1.0")
