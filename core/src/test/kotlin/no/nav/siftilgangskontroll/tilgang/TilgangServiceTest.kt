@@ -5,9 +5,7 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
-import com.github.tomakehurst.wiremock.WireMockServer
-import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
+import assertk.assertions.isNull
 import no.nav.siftilgangskontroll.core.behandling.Behandling
 import no.nav.siftilgangskontroll.core.pdl.utils.PdlOperasjon
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentIdenterResponse
@@ -15,12 +13,12 @@ import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonBolkResponse
 import no.nav.siftilgangskontroll.core.pdl.utils.pdlHentPersonResponse
 import no.nav.siftilgangskontroll.core.tilgang.BarnResponse
 import no.nav.siftilgangskontroll.core.tilgang.BarnTilgangForespørsel
-import no.nav.siftilgangskontroll.core.tilgang.TilgangService
 import no.nav.siftilgangskontroll.pdl.generated.enums.AdressebeskyttelseGradering.STRENGT_FORTROLIG
 import no.nav.siftilgangskontroll.pdl.generated.enums.IdentGruppe
 import no.nav.siftilgangskontroll.pdl.generated.hentperson.*
 import no.nav.siftilgangskontroll.policy.spesification.PolicyDecision
 import no.nav.siftilgangskontroll.policy.spesification.PolicyEvaluation
+import no.nav.siftilgangskontroll.utils.PdlIntegrasjonstest
 import no.nav.siftilgangskontroll.utils.hentToken
 import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentIdenterResult
 import no.nav.siftilgangskontroll.wiremock.PdlResponses.defaultHentPersonBolkResult
@@ -29,38 +27,16 @@ import no.nav.siftilgangskontroll.wiremock.stubPdlRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.wiremock.spring.ConfigureWireMock
-import org.wiremock.spring.EnableWireMock
-import org.wiremock.spring.InjectWireMock
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDate
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Adressebeskyttelse as BarnAdressebeskyttelse
+import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Doedsfall as BarnDoedsfall
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Foedselsdato as BarnFødsel
 import no.nav.siftilgangskontroll.pdl.generated.hentbarn.Folkeregisteridentifikator as BarnFolkeregisteridentifikator
 
-@ExtendWith(SpringExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DirtiesContext
-@ActiveProfiles("test")
-@EnableMockOAuth2Server // Tilgjengliggjør en oicd-provider for test.
-@EnableWireMock(ConfigureWireMock(name = "pdl-api", portProperties = ["wiremock.server.port"]))
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // Integrasjonstest - Kjører opp hele Spring Context med alle konfigurerte beans.
-class TilgangServiceTest {
-
-    @Autowired
-    private lateinit var tilgangService: TilgangService
-
-    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    lateinit var mockOAuth2Server: MockOAuth2Server
-
-    @InjectWireMock("pdl-api")
-    private lateinit var wireMockServer: WireMockServer
+class TilgangServiceTest : PdlIntegrasjonstest() {
 
     private lateinit var jwtToken: String
 
@@ -153,6 +129,94 @@ class TilgangServiceTest {
                 PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.DENY)
+            )
+        )
+    }
+
+    @Test
+    fun `gitt NAV-bruker, forvent nektet tilgang til barn som ikke lenger er i live`() {
+        val relatertPersonsIdent = "123"
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = relatertPersonsIdent
+                )
+            )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
+                        dødsdato = BarnDoedsfall(LocalDate.now().toString())
+                    )
+                )
+            )
+        }
+
+        val barnOppslagRespons = tilgangService.hentBarn(
+            barnTilgangForespørsel = BarnTilgangForespørsel(barnIdenter = listOf(relatertPersonsIdent)),
+            bearerToken = jwtToken,
+            systemToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
+
+        assertThat(barnOppslagRespons[0].barn).isNull()
+        assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(PolicyDecision.DENY)
+        assertThat(barnOppslagRespons[0].policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.DENY),
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.4", decision = PolicyDecision.PERMIT)
+            )
+        )
+    }
+
+    @ParameterizedTest(name = "{0} dager til 18-årsdagen gir {1}")
+    @CsvSource("0, DENY", "1, PERMIT")
+    fun `gitt barn rundt 18-årsdagen, forvent nektet tilgang fra og med 18-årsdagen`(
+        dagerTilAttenårsdagen: Long,
+        forventet: PolicyDecision,
+    ) {
+        val relatertPersonsIdent = "123"
+        val fødselsdato = LocalDate.now().minusYears(18).plusDays(dagerTilAttenårsdagen)
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    relatertPersonsIdent = relatertPersonsIdent
+                )
+            )
+        }
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON_BOLK) {
+            pdlHentPersonBolkResponse(
+                personBolk = listOf(
+                    defaultHentPersonBolkResult(
+                        folkeregisteridentifikator = BarnFolkeregisteridentifikator(relatertPersonsIdent),
+                        fødselsdato = BarnFødsel(fødselsdato.toString())
+                    )
+                )
+            )
+        }
+
+        val barnOppslagRespons = tilgangService.hentBarn(
+            barnTilgangForespørsel = BarnTilgangForespørsel(barnIdenter = listOf(relatertPersonsIdent)),
+            bearerToken = jwtToken,
+            systemToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
+
+        assertThat(barnOppslagRespons[0].policyEvaluation.decision).isEqualTo(forventet)
+        assertThat(barnOppslagRespons[0].policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "SIF.1", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.2", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.3", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "SIF.4", decision = forventet)
             )
         )
     }
@@ -287,6 +351,36 @@ class TilgangServiceTest {
             listOf(
                 PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
                 PolicyEvaluationResult(id = "FP.11", decision = PolicyDecision.DENY)
+            )
+        )
+    }
+
+    @ParameterizedTest(name = "{0} dager til 18-årsdagen gir {1}")
+    @CsvSource("0, PERMIT", "1, DENY")
+    fun `gitt NAV-bruker rundt 18-årsdagen, forvent tilgang fra og med 18-årsdagen`(
+        dagerTilAttenårsdagen: Long,
+        forventet: PolicyDecision,
+    ) {
+        val fødselsdato = LocalDate.now().minusYears(18).plusDays(dagerTilAttenårsdagen)
+
+        wireMockServer.stubPdlRequest(PdlOperasjon.HENT_PERSON) {
+            pdlHentPersonResponse(
+                person = defaultHentPersonResult(
+                    foedselsdato = Foedselsdato(fødselsdato.toString())
+                )
+            )
+        }
+
+        val personOppslagRespons = tilgangService.hentPerson(
+            bearerToken = jwtToken,
+            behandling = Behandling.PLEIEPENGER_SYKT_BARN
+        )
+
+        assertThat(personOppslagRespons.policyEvaluation.decision).isEqualTo(forventet)
+        assertThat(personOppslagRespons.policyEvaluation.children.resultat()).isEqualTo(
+            listOf(
+                PolicyEvaluationResult(id = "FP.10", decision = PolicyDecision.PERMIT),
+                PolicyEvaluationResult(id = "FP.11", decision = forventet)
             )
         )
     }

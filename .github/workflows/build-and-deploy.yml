@@ -7,8 +7,6 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'CODEOWNERS'
-      - '.github/workflows/apply-alerts.yml'
-      - 'nais/alerterator-*'
     branches:
 
 jobs:
@@ -45,29 +43,25 @@ jobs:
       branch: master
       javaversion: 25
 
-  build:
-    uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@main
-    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') || github.event.deployment.payload.triggered # Build and push docker if branch is either master or dev-*
-    permissions:
-      contents: write
-      id-token: write
-    secrets: inherit
-    with:
-      team: dusseldorf
-      readertoken: false
-      buildcommand: '--configuration-cache build -x test'
-      javaversion: 25
-
   trivy:
-    needs: [ build ]
-    if: startsWith(github.ref, 'refs/heads/dev-') || startsWith(github.ref, 'refs/heads/master') || github.event.deployment.payload.triggered # Build and push docker if branch is either master or dev-*
-    uses: navikt/sif-gha-workflows/.github/workflows/trivy.yml@main
+    runs-on: ubuntu-latest
     permissions:
-      contents: write
-      security-events: write
-      id-token: write
+      contents: read
+      security-events: write # last opp SARIF til GitHub Security
       actions: read
-    secrets: inherit
-    with:
-      image: ${{ needs.build.outputs.image }}
-      team: dusseldorf
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v7.0.1
+      - name: Skann gradle.lockfile med Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # ratchet:aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'fs'
+          scanners: 'vuln'
+          format: 'sarif'
+          output: 'trivy.sarif'
+          severity: 'HIGH,CRITICAL'
+          limit-severities-for-sarif: true
+      - name: Last opp resultatet til GitHub Security
+        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # ratchet:github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy.sarif'
+          category: trivy-fs
